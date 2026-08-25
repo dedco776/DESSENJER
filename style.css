@@ -7,19 +7,32 @@
 :root {
   --bg: #070b14;
   --panel: #0b1220;
-  --panel-2: #0e1728;
+  --panel2: #0e1728;
+
   --blue: #1683ff;
-  --blue-light: #38a1ff;
+  --blue2: #0057ff;
+
   --text: #f1f6ff;
   --muted: #8290a8;
+
   --border: rgba(60, 140, 255, 0.15);
+
+  --green: #27d980;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
 }
 
 body {
   font-family: Arial, sans-serif;
+
   background: var(--bg);
+
   color: var(--text);
-  height: 100vh;
+
   overflow: hidden;
 }
 
@@ -29,55 +42,243 @@ input {
 }
 
 button {
-  border: none;
+  border: 0;
   cursor: pointer;
 }
 
+
+/* =========================
+   AUTH
+========================= */
+
+.auth-screen {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(22, 131, 255, 0.15),
+      transparent 45%
+    ),
+    #050914;
+}
+
+.auth-card {
+  width: min(420px, 92%);
+
+  padding: 35px;
+
+  background: rgba(11, 18, 32, 0.96);
+
+  border: 1px solid var(--border);
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 0 60px rgba(22, 131, 255, 0.12);
+}
+
+.auth-logo {
+  width: 60px;
+  height: 60px;
+
+  margin: 0 auto 15px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--blue),
+      var(--blue2)
+    );
+
+  font-size: 28px;
+
+  font-weight: bold;
+
+  box-shadow:
+    0 0 30px rgba(22, 131, 255, 0.4);
+}
+
+.auth-card h1 {
+  text-align: center;
+
+  letter-spacing: 2px;
+}
+
+.auth-subtitle {
+  text-align: center;
+
+  color: var(--muted);
+
+  margin: 8px 0 25px;
+}
+
+.auth-tabs {
+  display: flex;
+
+  gap: 5px;
+
+  margin-bottom: 18px;
+}
+
+.auth-tabs button {
+  flex: 1;
+
+  padding: 11px;
+
+  border-radius: 9px;
+
+  background: var(--panel2);
+
+  color: var(--muted);
+}
+
+.auth-tabs button.active {
+  background: var(--blue);
+
+  color: white;
+}
+
+#authForm {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+#authForm input {
+  width: 100%;
+
+  padding: 13px 15px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 10px;
+
+  background: #070e1a;
+
+  color: white;
+
+  outline: none;
+}
+
+#authForm input:focus {
+  border-color: var(--blue);
+}
+
+#authButton {
+  padding: 13px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--blue),
+      var(--blue2)
+    );
+
+  color: white;
+
+  font-weight: bold;
+}
+
+#authMessage {
+  min-height: 20px;
+
+  margin-top: 15px;
+
+  text-align: center;
+
+  font-size: 13px;
+
+  color: var(--muted);
+}
+
+
+/* =========================
+   APP
+========================= */
+
 .app {
   display: flex;
+
+  width: 100%;
   height: 100vh;
 }
 
 
 /* =========================
-   LEFT SIDEBAR
+   SIDEBAR
 ========================= */
 
 .sidebar {
   width: 280px;
-  background: var(--panel);
-  border-right: 1px solid var(--border);
+
   display: flex;
+
   flex-direction: column;
+
+  background: var(--panel);
+
+  border-right: 1px solid var(--border);
 }
 
 .brand {
   height: 70px;
+
   display: flex;
+
   align-items: center;
+
   gap: 12px;
+
   padding: 0 20px;
+
   border-bottom: 1px solid var(--border);
+
   font-weight: bold;
+
   letter-spacing: 1px;
 }
 
 .logo {
   width: 38px;
   height: 38px;
-  border-radius: 12px;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  background: linear-gradient(
-    135deg,
-    var(--blue),
-    #0057ff
-  );
+  border-radius: 12px;
 
-  box-shadow: 0 0 25px rgba(22, 131, 255, 0.45);
+  background:
+    linear-gradient(
+      135deg,
+      var(--blue),
+      var(--blue2)
+    );
+
+  box-shadow:
+    0 0 25px rgba(22, 131, 255, 0.45);
 
   font-size: 20px;
 }
@@ -88,41 +289,48 @@ button {
 
 .search input {
   width: 100%;
+
   padding: 11px 14px;
 
   border: 1px solid var(--border);
+
   border-radius: 10px;
 
   background: #070e1a;
+
   color: white;
+
   outline: none;
 }
 
 .search input:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 10px rgba(22, 131, 255, 0.2);
 }
 
 .section-title {
   padding: 5px 18px 10px;
 
-  font-size: 11px;
   color: var(--muted);
+
+  font-size: 11px;
+
   letter-spacing: 1.5px;
 }
 
 .chat {
   display: flex;
+
   align-items: center;
 
   gap: 12px;
+
   padding: 12px 15px;
+
   margin: 3px 8px;
 
   border-radius: 10px;
 
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .chat:hover {
@@ -131,6 +339,7 @@ button {
 
 .chat.active {
   background: rgba(22, 131, 255, 0.14);
+
   border-left: 3px solid var(--blue);
 }
 
@@ -138,69 +347,96 @@ button {
   width: 40px;
   height: 40px;
 
-  border-radius: 50%;
+  flex-shrink: 0;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  background: linear-gradient(
-    135deg,
-    #1683ff,
-    #0057d9
-  );
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--blue),
+      var(--blue2)
+    );
 
   font-weight: bold;
-
-  flex-shrink: 0;
 }
 
 .chat-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
   min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
 }
 
 .chat-info span {
   color: var(--muted);
+
   font-size: 12px;
 
   white-space: nowrap;
+
   overflow: hidden;
+
   text-overflow: ellipsis;
 }
+
+
+/* =========================
+   PROFILE
+========================= */
 
 .profile {
   margin-top: auto;
 
   display: flex;
+
   align-items: center;
+
   gap: 10px;
 
   padding: 15px;
 
   background: #080f1b;
+
   border-top: 1px solid var(--border);
 }
 
-.profile > div:nth-child(2) {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.profile-info {
   flex: 1;
-}
 
-.profile button {
-  background: transparent;
-  color: var(--muted);
-  font-size: 18px;
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
 }
 
 .online {
-  color: #27d980;
+  color: var(--green);
+
   font-size: 11px;
+}
+
+#logoutButton {
+  background: transparent;
+
+  color: var(--muted);
+
+  font-size: 20px;
+}
+
+#logoutButton:hover {
+  color: #ff5577;
 }
 
 
@@ -211,10 +447,11 @@ button {
 .chat-window {
   flex: 1;
 
-  display: flex;
-  flex-direction: column;
-
   min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
 
   background:
     radial-gradient(
@@ -229,13 +466,16 @@ button {
   height: 70px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   padding: 0 22px;
 
-  border-bottom: 1px solid var(--border);
   background: rgba(8, 14, 25, 0.8);
+
+  border-bottom: 1px solid var(--border);
 }
 
 .chat-header h2 {
@@ -243,12 +483,14 @@ button {
 }
 
 .status {
-  color: #27d980;
+  color: var(--green);
+
   font-size: 11px;
 }
 
 .header-actions {
   display: flex;
+
   gap: 8px;
 }
 
@@ -259,13 +501,13 @@ button {
   border-radius: 9px;
 
   background: rgba(255, 255, 255, 0.04);
-  color: #b9c7dc;
 
-  transition: 0.2s;
+  color: #b9c7dc;
 }
 
 .header-actions button:hover {
   background: rgba(22, 131, 255, 0.15);
+
   color: white;
 }
 
@@ -284,6 +526,7 @@ button {
 
 .message {
   display: flex;
+
   gap: 12px;
 
   max-width: 650px;
@@ -296,13 +539,15 @@ button {
 
   padding: 11px 14px;
 
-  background: var(--panel-2);
+  background: var(--panel2);
 
   border: 1px solid var(--border);
 
   border-radius: 4px 12px 12px 12px;
 
   color: #d9e5f5;
+
+  word-break: break-word;
 }
 
 .message small {
@@ -311,6 +556,7 @@ button {
   margin-top: 5px;
 
   color: var(--muted);
+
   font-size: 10px;
 }
 
@@ -318,15 +564,17 @@ button {
   margin-left: auto;
 
   justify-content: flex-end;
+
   text-align: right;
 }
 
 .message.sent p {
-  background: linear-gradient(
-    135deg,
-    #086ce0,
-    #1253b9
-  );
+  background:
+    linear-gradient(
+      135deg,
+      #086ce0,
+      #1253b9
+    );
 
   border: none;
 
@@ -337,31 +585,38 @@ button {
 
 
 /* =========================
-   INPUT
+   MESSAGE INPUT
 ========================= */
 
 .message-input {
   display: flex;
+
   align-items: center;
+
   gap: 10px;
 
   padding: 15px 20px;
 
-  border-top: 1px solid var(--border);
   background: var(--panel);
+
+  border-top: 1px solid var(--border);
 }
 
 .message-input input {
   flex: 1;
 
+  min-width: 0;
+
   padding: 13px 16px;
 
   border: 1px solid var(--border);
+
   border-radius: 12px;
 
   background: #070e1a;
 
   color: white;
+
   outline: none;
 }
 
@@ -376,6 +631,8 @@ button {
   width: 44px;
   height: 44px;
 
+  flex-shrink: 0;
+
   border-radius: 12px;
 
   color: white;
@@ -386,14 +643,21 @@ button {
 }
 
 #sendButton {
-  background: linear-gradient(
-    135deg,
-    var(--blue),
-    #0057ff
-  );
+  background:
+    linear-gradient(
+      135deg,
+      var(--blue),
+      var(--blue2)
+    );
 
   box-shadow:
     0 0 18px rgba(22, 131, 255, 0.3);
+}
+
+#sendButton:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
 }
 
 
@@ -412,38 +676,41 @@ button {
 }
 
 .members h3 {
-  font-size: 11px;
+  margin-bottom: 20px;
+
   color: var(--muted);
 
-  letter-spacing: 1px;
+  font-size: 11px;
 
-  margin-bottom: 20px;
+  letter-spacing: 1px;
 }
 
 .member {
+  position: relative;
+
   display: flex;
+
   align-items: center;
+
   gap: 10px;
 
   margin-bottom: 15px;
-
-  position: relative;
 }
 
 .member i {
+  position: absolute;
+
+  left: 29px;
+  bottom: 0;
+
   width: 9px;
   height: 9px;
 
   border-radius: 50%;
 
-  background: #27d980;
+  background: var(--green);
 
   border: 2px solid var(--panel);
-
-  position: absolute;
-
-  left: 29px;
-  bottom: 0;
 }
 
 
@@ -469,18 +736,20 @@ button {
   .search,
   .section-title,
   .chat-info,
-  .profile > div:nth-child(2),
-  .profile button {
+  .profile-info,
+  #logoutButton {
     display: none;
   }
 
   .brand {
     justify-content: center;
+
     padding: 0;
   }
 
   .chat {
     justify-content: center;
+
     padding: 10px;
   }
 
@@ -492,4 +761,8 @@ button {
     padding: 15px;
   }
 
-}
+  .auth-card {
+    padding: 25px;
+  }
+
+  }
