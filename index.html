@@ -2,10 +2,22 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="DESSENJER — modern tech-blue messenger"
+  >
+
+  <meta name="theme-color" content="#070b14">
 
   <title>DESSENJER</title>
 
+  <!-- Main stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,7 +25,10 @@
 
   <div class="app">
 
-    <!-- LEFT SIDEBAR -->
+    <!-- =========================
+         LEFT SIDEBAR
+    ========================== -->
+
     <aside class="sidebar">
 
       <div class="brand">
@@ -22,87 +37,195 @@
       </div>
 
       <div class="search">
-        <input type="text" placeholder="Search...">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search..."
+          autocomplete="off"
+        >
       </div>
 
-      <div class="section-title">CHATS</div>
+      <div class="section-title">
+        CHATS
+      </div>
 
-      <div class="chat active">
-        <div class="avatar">A</div>
-        <div class="chat-info">
-          <strong>Alex</strong>
-          <span>Hey 👋</span>
+      <div id="chatList">
+
+        <div class="chat active">
+
+          <div class="avatar">
+            A
+          </div>
+
+          <div class="chat-info">
+            <strong>Alex</strong>
+            <span>Hey 👋</span>
+          </div>
+
         </div>
+
+
+        <div class="chat">
+
+          <div class="avatar">
+            J
+          </div>
+
+          <div class="chat-info">
+            <strong>Jasur</strong>
+            <span>See you later</span>
+          </div>
+
+        </div>
+
+
+        <div class="chat">
+
+          <div class="avatar">
+            M
+          </div>
+
+          <div class="chat-info">
+            <strong>Madina</strong>
+            <span>New message</span>
+          </div>
+
+        </div>
+
       </div>
 
-      <div class="chat">
-        <div class="avatar">J</div>
-        <div class="chat-info">
-          <strong>Jasur</strong>
-          <span>See you later</span>
-        </div>
-      </div>
 
-      <div class="chat">
-        <div class="avatar">M</div>
-        <div class="chat-info">
-          <strong>Madina</strong>
-          <span>New message</span>
-        </div>
-      </div>
+      <!-- USER PROFILE -->
 
       <div class="profile">
-        <div class="avatar">D</div>
 
-        <div>
-          <strong>Diyor</strong>
-          <span class="online">● Online</span>
+        <div class="avatar">
+          D
         </div>
 
-        <button>⚙</button>
+        <div>
+
+          <strong>Diyor</strong>
+
+          <span class="online">
+            ● Online
+          </span>
+
+        </div>
+
+        <button
+          id="settingsButton"
+          type="button"
+          aria-label="Settings"
+        >
+          ⚙
+        </button>
+
       </div>
 
     </aside>
 
 
-    <!-- MAIN CHAT -->
+    <!-- =========================
+         MAIN CHAT
+    ========================== -->
+
     <main class="chat-window">
+
+      <!-- CHAT HEADER -->
 
       <header class="chat-header">
 
         <div>
-          <h2>Alex</h2>
-          <span class="status">● Online</span>
+
+          <h2 id="chatTitle">
+            Alex
+          </h2>
+
+          <span class="status">
+            ● Online
+          </span>
+
         </div>
 
+
         <div class="header-actions">
-          <button>🔍</button>
-          <button>📞</button>
-          <button>⋮</button>
+
+          <button
+            type="button"
+            aria-label="Search"
+          >
+            🔍
+          </button>
+
+          <button
+            type="button"
+            aria-label="Call"
+          >
+            📞
+          </button>
+
+          <button
+            type="button"
+            aria-label="More"
+          >
+            ⋮
+          </button>
+
         </div>
 
       </header>
 
 
-      <section class="messages">
+      <!-- MESSAGES -->
+
+      <section
+        class="messages"
+        id="messages"
+        aria-label="Messages"
+      >
 
         <div class="message received">
-          <div class="avatar">A</div>
+
+          <div class="avatar">
+            A
+          </div>
 
           <div>
-            <strong>Alex</strong>
-            <p>Hey! Welcome to DESSENJER 👋</p>
-            <small>21:40</small>
+
+            <strong>
+              Alex
+            </strong>
+
+            <p>
+              Hey! Welcome to DESSENJER 👋
+            </p>
+
+            <small>
+              21:40
+            </small>
+
           </div>
+
         </div>
 
 
         <div class="message sent">
 
           <div>
-            <strong>You</strong>
-            <p>Thanks! 🔥 This looks awesome.</p>
-            <small>21:41</small>
+
+            <strong>
+              You
+            </strong>
+
+            <p>
+              Thanks! 🔥 This looks awesome.
+            </p>
+
+            <small>
+              21:41
+            </small>
+
           </div>
 
         </div>
@@ -110,50 +233,119 @@
       </section>
 
 
-      <!-- MESSAGE INPUT -->
+      <!-- =========================
+           MESSAGE INPUT
+      ========================== -->
+
       <footer class="message-input">
 
-        <button class="attach">＋</button>
+        <button
+          class="attach"
+          id="attachButton"
+          type="button"
+          aria-label="Attach file"
+        >
+          ＋
+        </button>
+
 
         <input
           id="messageInput"
           type="text"
           placeholder="Write a message..."
+          autocomplete="off"
+          maxlength="2000"
         >
 
-        <button id="sendButton">➤</button>
+
+        <button
+          id="sendButton"
+          type="button"
+          aria-label="Send message"
+        >
+          ➤
+        </button>
 
       </footer>
 
     </main>
 
 
-    <!-- RIGHT SIDEBAR -->
+    <!-- =========================
+         RIGHT SIDEBAR
+    ========================== -->
+
     <aside class="members">
 
-      <h3>ONLINE — 3</h3>
+      <h3>
+        ONLINE — 3
+      </h3>
+
 
       <div class="member">
-        <div class="avatar">A</div>
-        <span>Alex</span>
+
+        <div class="avatar">
+          A
+        </div>
+
+        <span>
+          Alex
+        </span>
+
         <i></i>
+
       </div>
 
-      <div class="member">
-        <div class="avatar">J</div>
-        <span>Jasur</span>
-        <i></i>
-      </div>
 
       <div class="member">
-        <div class="avatar">M</div>
-        <span>Madina</span>
+
+        <div class="avatar">
+          J
+        </div>
+
+        <span>
+          Jasur
+        </span>
+
         <i></i>
+
+      </div>
+
+
+      <div class="member">
+
+        <div class="avatar">
+          M
+        </div>
+
+        <span>
+          Madina
+        </span>
+
+        <i></i>
+
       </div>
 
     </aside>
 
   </div>
+
+
+  <!-- =========================
+       SUPABASE
+  ========================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+
+  <!-- DESSENJER API -->
+
+  <script src="api/api.js"></script>
+
+
+  <!-- DESSENJER APP -->
 
   <script src="js/app.js"></script>
 
