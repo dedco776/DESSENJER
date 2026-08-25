@@ -64,6 +64,8 @@ let registerMode = false;
 
 let currentUser = null;
 
+let currentProfile = null;
+
 
 // ========================================
 // AUTH MODE
@@ -114,7 +116,7 @@ registerTab.addEventListener("click", () => {
 
 
 // ========================================
-// AUTH SUBMIT
+// AUTH FORM
 // ========================================
 
 authForm.addEventListener(
@@ -145,6 +147,17 @@ authForm.addEventListener(
 
         return;
       }
+
+
+      if (username.length < 3) {
+
+        showAuthMessage(
+          "Username kamida 3 ta belgidan iborat bo‘lsin."
+        );
+
+        return;
+      }
+
 
       await registerUser(
         email,
@@ -177,28 +190,31 @@ async function registerUser(
 
   setAuthLoading(true);
 
+
   const {
     data,
     error
-  } = await supabaseClient.auth.signUp({
+  } =
+    await supabaseClient.auth.signUp({
 
-    email: email,
+      email: email,
 
-    password: password,
+      password: password,
 
-    options: {
-      data: {
-        username: username
+      options: {
+
+        data: {
+          username: username
+        }
+
       }
-    }
 
-  });
-
-
-  setAuthLoading(false);
+    });
 
 
   if (error) {
+
+    setAuthLoading(false);
 
     showAuthMessage(
       error.message
@@ -208,7 +224,26 @@ async function registerUser(
   }
 
 
+  if (!data.user) {
+
+    setAuthLoading(false);
+
+    showAuthMessage(
+      "Account yaratishda xatolik."
+    );
+
+    return;
+  }
+
+
+  /*
+   * Agar email confirmation yoqilgan bo‘lsa,
+   * session hali bo‘lmasligi mumkin.
+   */
+
   if (!data.session) {
+
+    setAuthLoading(false);
 
     showAuthMessage(
       "Account yaratildi. Emailingizni tasdiqlang, keyin Login qiling."
@@ -220,6 +255,32 @@ async function registerUser(
 
   currentUser =
     data.user;
+
+
+  const profile =
+    await createProfile(
+      currentUser.id,
+      username
+    );
+
+
+  if (!profile) {
+
+    setAuthLoading(false);
+
+    showAuthMessage(
+      "Account yaratildi, lekin profil yaratishda xatolik yuz berdi."
+    );
+
+    return;
+  }
+
+
+  currentProfile =
+    profile;
+
+
+  setAuthLoading(false);
 
   showApp();
 
@@ -237,23 +298,24 @@ async function loginUser(
 
   setAuthLoading(true);
 
+
   const {
     data,
     error
   } =
-    await supabaseClient.auth.signInWithPassword({
+    await supabaseClient.auth
+      .signInWithPassword({
 
-      email: email,
+        email: email,
 
-      password: password
+        password: password
 
-    });
-
-
-  setAuthLoading(false);
+      });
 
 
   if (error) {
+
+    setAuthLoading(false);
 
     showAuthMessage(
       error.message
@@ -266,7 +328,122 @@ async function loginUser(
   currentUser =
     data.user;
 
+
+  currentProfile =
+    await getProfile(
+      currentUser.id
+    );
+
+
+  if (!currentProfile) {
+
+    /*
+     * Eski yoki profilesiz account bo‘lsa,
+     * metadata'dagi username orqali profil yaratamiz.
+     */
+
+    const username =
+      currentUser
+        .user_metadata
+        ?.username
+        ||
+        currentUser.email
+          ?.split("@")[0]
+        ||
+        "User";
+
+
+    currentProfile =
+      await createProfile(
+        currentUser.id,
+        username
+      );
+
+  }
+
+
+  setAuthLoading(false);
+
   showApp();
+
+}
+
+
+// ========================================
+// CREATE PROFILE
+// ========================================
+
+async function createProfile(
+  userId,
+  username
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .insert({
+
+        id: userId,
+
+        username: username,
+
+        status: "online"
+
+      })
+      .select()
+      .single();
+
+
+  if (error) {
+
+    console.error(
+      "Profile create error:",
+      error
+    );
+
+    return null;
+  }
+
+
+  return data;
+
+}
+
+
+// ========================================
+// GET PROFILE
+// ========================================
+
+async function getProfile(
+  userId
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+
+  if (error) {
+
+    console.error(
+      "Profile load error:",
+      error
+    );
+
+    return null;
+  }
+
+
+  return data;
 
 }
 
@@ -279,14 +456,34 @@ logoutButton.addEventListener(
   "click",
   async () => {
 
+    if (currentUser) {
+
+      await supabaseClient
+        .from("profiles")
+        .update({
+          status: "offline"
+        })
+        .eq(
+          "id",
+          currentUser.id
+        );
+
+    }
+
+
     await supabaseClient.auth.signOut();
 
+
     currentUser = null;
+
+    currentProfile = null;
+
 
     app.hidden = true;
 
     authScreen.style.display =
       "flex";
+
 
     authForm.reset();
 
@@ -303,10 +500,42 @@ logoutButton.addEventListener(
 supabaseClient.auth.onAuthStateChange(
   async (event, session) => {
 
-    if (session?.user) {
+    if (
+      session?.user &&
+      !currentUser
+    ) {
 
       currentUser =
         session.user;
+
+
+      currentProfile =
+        await getProfile(
+          currentUser.id
+        );
+
+
+      if (!currentProfile) {
+
+        const username =
+          currentUser
+            .user_metadata
+            ?.username
+            ||
+            currentUser.email
+              ?.split("@")[0]
+            ||
+            "User";
+
+
+        currentProfile =
+          await createProfile(
+            currentUser.id,
+            username
+          );
+
+      }
+
 
       showApp();
 
@@ -334,9 +563,14 @@ async function showApp() {
 
 
   const username =
-    currentUser.user_metadata?.username
+    currentProfile?.username
     ||
-    currentUser.email?.split("@")[0]
+    currentUser
+      .user_metadata
+      ?.username
+    ||
+    currentUser.email
+      ?.split("@")[0]
     ||
     "User";
 
@@ -351,7 +585,23 @@ async function showApp() {
       .toUpperCase();
 
 
+  /*
+   * User online holatiga o'tadi.
+   */
+
+  await supabaseClient
+    .from("profiles")
+    .update({
+      status: "online"
+    })
+    .eq(
+      "id",
+      currentUser.id
+    );
+
+
   await loadMessages();
+
 
   messageInput.focus();
 
@@ -359,7 +609,7 @@ async function showApp() {
 
 
 // ========================================
-// MESSAGES
+// LOAD MESSAGES
 // ========================================
 
 async function loadMessages() {
@@ -407,16 +657,20 @@ async function loadMessages() {
 // RENDER MESSAGE
 // ========================================
 
-function renderMessage(message) {
+function renderMessage(
+  message
+) {
 
   const element =
     document.createElement("div");
 
 
   const myUsername =
-    currentUser?.user_metadata?.username
+    currentProfile?.username
     ||
-    currentUser?.email?.split("@")[0];
+    currentUser
+      ?.user_metadata
+      ?.username;
 
 
   const isMine =
@@ -445,15 +699,21 @@ function renderMessage(message) {
 
     element.innerHTML = `
       <div>
-        <strong>You</strong>
+
+        <strong>
+          You
+        </strong>
 
         <p>
-          ${escapeHTML(message.content)}
+          ${escapeHTML(
+            message.content
+          )}
         </p>
 
         <small>
           ${time}
         </small>
+
       </div>
     `;
 
@@ -467,17 +727,23 @@ function renderMessage(message) {
 
     element.innerHTML = `
       <div class="avatar">
-        ${escapeHTML(firstLetter)}
+        ${escapeHTML(
+          firstLetter
+        )}
       </div>
 
       <div>
 
         <strong>
-          ${escapeHTML(message.username)}
+          ${escapeHTML(
+            message.username
+          )}
         </strong>
 
         <p>
-          ${escapeHTML(message.content)}
+          ${escapeHTML(
+            message.content
+          )}
         </p>
 
         <small>
@@ -513,19 +779,16 @@ async function sendMessage() {
 
 
   if (!currentUser) {
-
-    showAuthMessage(
-      "Avval login qiling."
-    );
-
     return;
   }
 
 
   const username =
-    currentUser.user_metadata?.username
+    currentProfile?.username
     ||
-    currentUser.email?.split("@")[0]
+    currentUser
+      .user_metadata
+      ?.username
     ||
     "User";
 
@@ -585,7 +848,7 @@ sendButton.addEventListener(
 
 
 // ========================================
-// ENTER SEND
+// ENTER
 // ========================================
 
 messageInput.addEventListener(
@@ -612,7 +875,9 @@ messageInput.addEventListener(
 // ========================================
 
 supabaseClient
-  .channel("dessenjer-messages")
+  .channel(
+    "dessenjer-messages"
+  )
   .on(
     "postgres_changes",
     {
@@ -658,7 +923,9 @@ searchInput.addEventListener(
 
         const name =
           chat
-            .querySelector("strong")
+            .querySelector(
+              "strong"
+            )
             .textContent
             .toLowerCase();
 
@@ -689,12 +956,16 @@ document
         () => {
 
           document
-            .querySelectorAll(".chat")
+            .querySelectorAll(
+              ".chat"
+            )
             .forEach(
               item => {
 
                 item.classList
-                  .remove("active");
+                  .remove(
+                    "active"
+                  );
 
               }
             );
@@ -707,7 +978,9 @@ document
 
           const name =
             chat
-              .querySelector("strong")
+              .querySelector(
+                "strong"
+              )
               .textContent;
 
 
@@ -733,10 +1006,14 @@ function scrollMessages() {
 }
 
 
-function escapeHTML(text) {
+function escapeHTML(
+  text
+) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   div.textContent =
     text;
@@ -771,6 +1048,7 @@ function setAuthLoading(
   authButton.disabled =
     loading;
 
+
   authButton.textContent =
     loading
       ? "Loading..."
@@ -790,13 +1068,44 @@ async function startApp() {
   const {
     data
   } =
-    await supabaseClient.auth.getSession();
+    await supabaseClient
+      .auth
+      .getSession();
 
 
   if (data.session) {
 
     currentUser =
       data.session.user;
+
+
+    currentProfile =
+      await getProfile(
+        currentUser.id
+      );
+
+
+    if (!currentProfile) {
+
+      const username =
+        currentUser
+          .user_metadata
+          ?.username
+          ||
+          currentUser.email
+            ?.split("@")[0]
+          ||
+          "User";
+
+
+      currentProfile =
+        await createProfile(
+          currentUser.id,
+          username
+        );
+
+    }
+
 
     showApp();
 
