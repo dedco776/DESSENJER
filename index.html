@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>DESSENJER</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+
+      <div class="brand">
+        <div class="logo">D</div>
+        <span>DESSENJER</span>
+      </div>
+
+      <div class="search">
+        <input type="text" placeholder="Search...">
+      </div>
+
+      <div class="section-title">CHATS</div>
+
+      <div class="chat active">
+        <div class="avatar">A</div>
+        <div class="chat-info">
+          <strong>Alex</strong>
+          <span>Hey 👋</span>
+        </div>
+      </div>
+
+      <div class="chat">
+        <div class="avatar">J</div>
+        <div class="chat-info">
+          <strong>Jasur</strong>
+          <span>See you later</span>
+        </div>
+      </div>
+
+      <div class="chat">
+        <div class="avatar">M</div>
+        <div class="chat-info">
+          <strong>Madina</strong>
+          <span>New message</span>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">D</div>
+
+        <div>
+          <strong>Diyor</strong>
+          <span class="online">● Online</span>
+        </div>
+
+        <button>⚙</button>
+      </div>
+
+    </aside>
+
+
+    <!-- MAIN CHAT -->
+    <main class="chat-window">
+
+      <header class="chat-header">
+
+        <div>
+          <h2>Alex</h2>
+          <span class="status">● Online</span>
+        </div>
+
+        <div class="header-actions">
+          <button>🔍</button>
+          <button>📞</button>
+          <button>⋮</button>
+        </div>
+
+      </header>
+
+
+      <section class="messages">
+
+        <div class="message received">
+          <div class="avatar">A</div>
+
+          <div>
+            <strong>Alex</strong>
+            <p>Hey! Welcome to DESSENJER 👋</p>
+            <small>21:40</small>
+          </div>
+        </div>
+
+
+        <div class="message sent">
+
+          <div>
+            <strong>You</strong>
+            <p>Thanks! 🔥 This looks awesome.</p>
+            <small>21:41</small>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- MESSAGE INPUT -->
+      <footer class="message-input">
+
+        <button class="attach">＋</button>
+
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Write a message..."
+        >
+
+        <button id="sendButton">➤</button>
+
+      </footer>
+
+    </main>
+
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="members">
+
+      <h3>ONLINE — 3</h3>
+
+      <div class="member">
+        <div class="avatar">A</div>
+        <span>Alex</span>
+        <i></i>
+      </div>
+
+      <div class="member">
+        <div class="avatar">J</div>
+        <span>Jasur</span>
+        <i></i>
+      </div>
+
+      <div class="member">
+        <div class="avatar">M</div>
+        <span>Madina</span>
+        <i></i>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <script src="js/app.js"></script>
+
+</body>
+</html>
