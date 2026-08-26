@@ -251,9 +251,6 @@
 
     <main class="chat-window">
 
-
-      <!-- HEADER -->
-
       <header class="chat-header">
 
         <div>
@@ -327,7 +324,6 @@
           </div>
 
         </div>
-
 
       </section>
 
@@ -424,17 +420,26 @@
   </div>
 
 
-  <!-- SUPABASE -->
+  <!-- =========================
+       SUPABASE
+       FALLBACK CDN
+  ========================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- API -->
+  <!-- Agar jsDelivr ishlamasa, brauzer konsolida ko‘rinadi -->
 
-  <script src="api/api.js"></script>
+  <!-- =========================
+       DESSENJER API
+  ========================== -->
 
-  <!-- APP -->
+  <script src="./api/api.js"></script>
 
-  <script src="js/app.js"></script>
+  <!-- =========================
+       DESSENJER APP
+  ========================== -->
+
+  <script src="./js/app.js"></script>
 
 </body>
 </html>
