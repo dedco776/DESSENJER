@@ -1,462 +1,889 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>DESSENJER</title>
 
-  <meta name="theme-color" content="#070b14">
+<style>
+:root{
+  --bg:#050b14;
+  --panel:#0a1422;
+  --panel2:#0d1a2b;
+  --line:rgba(115,164,220,.16);
+  --text:#f5f8ff;
+  --muted:#8393aa;
+  --blue:#1683ff;
+  --blue2:#0068e8;
+  --cyan:#48b9ff;
+  --green:#31d27c;
+  --danger:#ff526d;
+  --shadow:0 18px 60px rgba(0,0,0,.35);
+  --radius:22px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input{font:inherit}
+button{border:0;color:inherit;cursor:pointer}
+body{overflow:hidden;background:
+ radial-gradient(circle at 70% -10%,rgba(22,131,255,.16),transparent 30%),
+ linear-gradient(180deg,#07111f 0%,#050b14 100%)}
 
-  <title>DESSENJER</title>
+/* AUTH */
+.auth-screen{position:fixed;inset:0;display:grid;place-items:center;padding:22px;background:
+ radial-gradient(circle at 50% 20%,rgba(24,132,255,.18),transparent 35%),
+ #050b14;z-index:20}
+.auth-card{width:min(430px,100%);padding:34px;border:1px solid var(--line);border-radius:30px;background:rgba(10,20,34,.84);backdrop-filter:blur(26px);box-shadow:var(--shadow)}
+.auth-logo,.logo{display:grid;place-items:center;background:linear-gradient(145deg,#258fff,#0067df);box-shadow:0 10px 35px rgba(22,131,255,.3)}
+.auth-logo{width:72px;height:72px;border-radius:24px;font-size:34px;font-weight:800;margin:0 auto 20px}
+.auth-card h1{text-align:center;margin:0;font-size:30px;letter-spacing:-1px}
+.auth-subtitle{text-align:center;color:var(--muted);margin:9px 0 25px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;padding:4px;background:#07111e;border-radius:14px;margin-bottom:16px}
+.auth-tabs button{padding:11px;border-radius:11px;background:transparent;color:var(--muted)}
+.auth-tabs button.active{background:#13253a;color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+#authForm{display:grid;gap:11px}
+#authForm input{width:100%;padding:15px 16px;border-radius:15px;border:1px solid var(--line);outline:none;background:#07111e;color:#fff}
+#authForm input:focus{border-color:rgba(22,131,255,.75);box-shadow:0 0 0 4px rgba(22,131,255,.1)}
+#authButton{padding:15px;border-radius:15px;background:linear-gradient(135deg,#258fff,#0068e8);font-weight:750;box-shadow:0 10px 30px rgba(22,131,255,.22)}
+#authButton:disabled{opacity:.6}
+#authMessage{text-align:center;min-height:20px;color:#ff8094;margin:14px 0 0;font-size:14px}
 
-  <link rel="stylesheet" href="style.css">
+/* APP */
+.app{height:100dvh;display:grid;grid-template-columns:82px minmax(0,1fr) 250px;background:rgba(5,11,20,.82)}
+.sidebar{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line);background:rgba(8,18,31,.86);backdrop-filter:blur(24px)}
+.brand{height:76px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
+.brand span{display:none}
+.logo{width:50px;height:50px;border-radius:16px;font-size:24px;font-weight:800}
+.search{padding:14px 10px}
+.search input{width:100%;height:42px;border:1px solid var(--line);border-radius:13px;background:#07111e;color:#fff;outline:none;padding:0 12px}
+.search input::placeholder{color:#687a92}
+.section-title{display:none}
+#chatList{overflow:auto;padding:4px 8px}
+.chat{display:flex;align-items:center;gap:11px;padding:9px;border-radius:17px;margin:3px 0;transition:.2s}
+.chat:hover,.chat.active{background:rgba(28,107,190,.14)}
+.chat.active{box-shadow:inset 3px 0 0 var(--blue)}
+.avatar{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#268dff,#0065df);font-weight:750;box-shadow:0 8px 22px rgba(0,104,232,.22)}
+.chat-info{display:none;min-width:0}
+.chat-info strong,.chat-info span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-info span{font-size:12px;color:var(--muted);margin-top:3px}
+.profile{margin-top:auto;padding:13px 9px;border-top:1px solid var(--line);display:flex;justify-content:center;align-items:center;gap:10px}
+.profile-info{display:none;min-width:0}
+.profile-info strong,.profile-info span{display:block}
+.profile-info span{font-size:12px;color:var(--green);margin-top:3px}
+#logoutButton{width:38px;height:38px;border-radius:12px;background:#0d1b2d;color:#9aabc0;display:grid;place-items:center}
+
+/* CHAT */
+.chat-window{min-width:0;display:grid;grid-template-rows:76px minmax(0,1fr) 80px;background:linear-gradient(180deg,rgba(7,15,27,.9),rgba(3,9,17,.96))}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--line);background:rgba(8,17,29,.7);backdrop-filter:blur(18px)}
+.chat-header h2{margin:0;font-size:20px;letter-spacing:-.4px}
+.status{display:block;color:var(--green);font-size:13px;margin-top:4px}
+.header-actions{display:flex;gap:9px}
+.icon-btn{width:46px;height:46px;border-radius:15px;background:#0d1929;border:1px solid rgba(128,168,218,.08);display:grid;place-items:center;transition:.2s}
+.icon-btn:hover{background:#12243a;transform:translateY(-1px)}
+.icon-btn svg{width:20px;height:20px;stroke:currentColor}
+.messages{overflow:auto;padding:28px 5%;display:flex;flex-direction:column;gap:14px}
+.message{display:flex;gap:10px;align-items:flex-end;max-width:78%}
+.message.sent{align-self:flex-end;flex-direction:row-reverse}
+.message.received{align-self:flex-start}
+.message>div:last-child{min-width:0}
+.message strong{display:block;font-size:13px;color:#c8d5e7;margin:0 0 6px 7px}
+.message.sent strong{text-align:right;margin-right:7px}
+.message p{margin:0;padding:12px 15px;border-radius:18px 18px 18px 6px;background:#0e1c2e;border:1px solid var(--line);line-height:1.4;overflow-wrap:anywhere}
+.message.sent p{background:linear-gradient(145deg,#187ff1,#0668d9);border-color:transparent;border-radius:18px 18px 6px 18px}
+.message small{display:block;color:#718199;font-size:11px;margin:5px 7px 0}
+.message.sent small{text-align:right}
+.message .avatar{width:34px;height:34px;flex-basis:34px;font-size:13px}
+.message-input{display:grid;grid-template-columns:52px minmax(0,1fr) 58px;gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--line);background:rgba(7,15,27,.88);backdrop-filter:blur(20px)}
+.message-input input{height:54px;border-radius:18px;border:1px solid rgba(40,139,255,.7);background:#081524;color:#fff;outline:none;padding:0 17px;box-shadow:0 0 0 3px rgba(22,131,255,.05)}
+.message-input input::placeholder{color:#718199}
+.circle-btn{height:52px;width:52px;border-radius:17px;background:#0d1b2d;border:1px solid var(--line);display:grid;place-items:center}
+.send-btn{height:54px;width:58px;border-radius:18px;background:linear-gradient(145deg,#258fff,#0068e8);display:grid;place-items:center;box-shadow:0 10px 28px rgba(22,131,255,.24)}
+.send-btn svg{width:22px}
+
+/* MEMBERS */
+.members{border-left:1px solid var(--line);background:rgba(8,18,31,.75);padding:25px 18px;overflow:auto}
+.members h3{font-size:11px;letter-spacing:1.5px;color:#70819a;margin:0 0 15px}
+.member{display:flex;align-items:center;gap:11px;padding:10px;border-radius:14px}
+.member:hover{background:rgba(28,107,190,.1)}
+.member .avatar{width:38px;height:38px;flex-basis:38px;font-size:13px}
+.member span{font-size:14px;flex:1}
+.member i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(49,210,124,.5)}
+.search-empty{padding:20px 8px;color:var(--muted);font-size:13px;text-align:center}
+
+/* MODALS / TOAST */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.overlay.show{display:flex}
+.modal{width:min(390px,100%);padding:24px;border-radius:24px;border:1px solid var(--line);background:#0a1626;box-shadow:var(--shadow)}
+.modal h3{margin:0 0 8px}.modal p{color:var(--muted);line-height:1.5}
+.modal-actions{display:flex;gap:10px;margin-top:18px}
+.modal-actions button{flex:1;padding:12px;border-radius:13px;background:#102239}
+.modal-actions .primary{background:var(--blue)}
+.toast{position:fixed;left:50%;bottom:94px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#112239;border:1px solid var(--line);padding:11px 15px;border-radius:13px;z-index:80;transition:.25s;box-shadow:var(--shadow);font-size:13px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* DESKTOP */
+@media(min-width:850px){
+  .sidebar{min-width:250px}
+  .brand{justify-content:flex-start;padding:0 18px;gap:12px}
+  .brand span{display:block;font-weight:800;letter-spacing:.5px}
+  .chat-info,.profile-info{display:block}
+  .profile{justify-content:flex-start;padding:14px}
+}
+
+/* MOBILE */
+@media(max-width:849px){
+  .app{grid-template-columns:70px minmax(0,1fr)}
+  .members{display:none}
+  .sidebar{width:70px}
+  .search{padding:10px 8px}
+  .search input{font-size:0;padding:0;text-indent:-999px}
+  .search input:focus{font-size:13px;text-indent:0;padding:0 10px}
+  .chat{justify-content:center;padding:8px}
+  .chat.active{box-shadow:none}
+  .chat .avatar{width:48px;height:48px;flex-basis:48px}
+  .profile{padding:11px 7px}
+  #logoutButton{display:none}
+  .chat-header{padding:0 12px}
+  .header-actions{gap:6px}
+  .icon-btn{width:42px;height:42px;border-radius:14px}
+  .messages{padding:22px 14px}
+  .message{max-width:88%}
+  .message-input{padding:10px 9px;grid-template-columns:48px minmax(0,1fr) 54px;gap:7px}
+  .circle-btn{width:48px;height:48px}
+  .send-btn{width:54px;height:50px}
+  .message-input input{height:50px;border-radius:17px;min-width:0}
+}
+@media(max-width:430px){
+  .app{grid-template-columns:64px minmax(0,1fr)}
+  .sidebar{width:64px}
+  .chat-header h2{font-size:18px}
+  .header-actions .icon-btn:nth-child(3){display:none}
+  .messages{padding-left:10px;padding-right:10px}
+}
+</style>
 </head>
 
 <body>
 
-  <!-- =========================
-       AUTH SCREEN
-  ========================== -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">D</div>
+    <h1>DESSENJER</h1>
+    <p class="auth-subtitle">Secure. Fast. Connected.</p>
 
-  <div id="authScreen" class="auth-screen">
-
-    <div class="auth-card">
-
-      <div class="auth-logo">D</div>
-
-      <h1>DESSENJER</h1>
-
-      <p class="auth-subtitle">
-        Secure. Fast. Connected.
-      </p>
-
-      <div class="auth-tabs">
-
-        <button
-          id="loginTab"
-          class="active"
-          type="button"
-        >
-          Login
-        </button>
-
-        <button
-          id="registerTab"
-          type="button"
-        >
-          Register
-        </button>
-
-      </div>
-
-      <form id="authForm">
-
-        <input
-          id="usernameInput"
-          type="text"
-          placeholder="Username"
-          autocomplete="username"
-          hidden
-        >
-
-        <input
-          id="emailInput"
-          type="email"
-          placeholder="Email"
-          autocomplete="email"
-          required
-        >
-
-        <input
-          id="passwordInput"
-          type="password"
-          placeholder="Password"
-          autocomplete="current-password"
-          minlength="6"
-          required
-        >
-
-        <button
-          id="authButton"
-          type="submit"
-        >
-          Login
-        </button>
-
-      </form>
-
-      <p id="authMessage"></p>
-
+    <div class="auth-tabs">
+      <button id="loginTab" class="active" type="button">Login</button>
+      <button id="registerTab" type="button">Register</button>
     </div>
 
+    <form id="authForm">
+      <input id="usernameInput" type="text" placeholder="Username" autocomplete="username" hidden>
+      <input id="emailInput" type="email" placeholder="Email" autocomplete="email" required>
+      <input id="passwordInput" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
+      <button id="authButton" type="submit">Login</button>
+    </form>
+    <p id="authMessage"></p>
   </div>
+</div>
 
+<div id="app" class="app" hidden>
 
-  <!-- =========================
-       MAIN APPLICATION
-  ========================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">D</div>
+      <span>DESSENJER</span>
+    </div>
 
-  <div
-    class="app"
-    id="app"
-    hidden
-  >
+    <div class="search">
+      <input id="searchInput" type="search" placeholder="Search..." autocomplete="off">
+    </div>
 
-    <!-- LEFT SIDEBAR -->
+    <div class="section-title">CHATS</div>
+    <div id="chatList"></div>
 
-    <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar" id="profileAvatar">D</div>
+      <div class="profile-info">
+        <strong id="profileName">User</strong>
+        <span>● Online</span>
+      </div>
+      <button id="logoutButton" title="Logout" type="button" aria-label="Logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-6"/></svg>
+      </button>
+    </div>
+  </aside>
 
-      <div class="brand">
-
-        <div class="logo">
-          D
-        </div>
-
-        <span>
-          DESSENJER
-        </span>
-
+  <main class="chat-window">
+    <header class="chat-header">
+      <div>
+        <h2 id="chatTitle">DESSENJER</h2>
+        <span id="chatStatus" class="status">● Online</span>
       </div>
 
-
-      <div class="search">
-
-        <input
-          id="searchInput"
-          type="search"
-          placeholder="Search..."
-          autocomplete="off"
-        >
-
-      </div>
-
-
-      <div class="section-title">
-        CHATS
-      </div>
-
-
-      <div id="chatList">
-
-        <div
-          class="chat active"
-          data-name="Alex"
-        >
-
-          <div class="avatar">
-            A
-          </div>
-
-          <div class="chat-info">
-
-            <strong>
-              Alex
-            </strong>
-
-            <span>
-              Hey 👋
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="chat"
-          data-name="Jasur"
-        >
-
-          <div class="avatar">
-            J
-          </div>
-
-          <div class="chat-info">
-
-            <strong>
-              Jasur
-            </strong>
-
-            <span>
-              See you later
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="chat"
-          data-name="Madina"
-        >
-
-          <div class="avatar">
-            M
-          </div>
-
-          <div class="chat-info">
-
-            <strong>
-              Madina
-            </strong>
-
-            <span>
-              New message
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- PROFILE -->
-
-      <div class="profile">
-
-        <div
-          class="avatar"
-          id="profileAvatar"
-        >
-          D
-        </div>
-
-        <div class="profile-info">
-
-          <strong id="profileName">
-            User
-          </strong>
-
-          <span class="online">
-            ● Online
-          </span>
-
-        </div>
-
-        <button
-          id="logoutButton"
-          type="button"
-          title="Logout"
-        >
-          ⏻
+      <div class="header-actions">
+        <button class="icon-btn" id="searchButton" type="button" title="Search" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
         </button>
-
-      </div>
-
-    </aside>
-
-
-    <!-- MAIN CHAT -->
-
-    <main class="chat-window">
-
-      <header class="chat-header">
-
-        <div>
-
-          <h2 id="chatTitle">
-            Alex
-          </h2>
-
-          <span class="status">
-            ● Online
-          </span>
-
-        </div>
-
-
-        <div class="header-actions">
-
-          <button
-            type="button"
-            title="Search"
-          >
-            🔍
-          </button>
-
-          <button
-            type="button"
-            title="Call"
-          >
-            📞
-          </button>
-
-          <button
-            type="button"
-            title="More"
-          >
-            ⋮
-          </button>
-
-        </div>
-
-      </header>
-
-
-      <!-- MESSAGES -->
-
-      <section
-        class="messages"
-        id="messages"
-      >
-
-        <div class="message received">
-
-          <div class="avatar">
-            A
-          </div>
-
-          <div>
-
-            <strong>
-              Alex
-            </strong>
-
-            <p>
-              Hey! Welcome to DESSENJER 👋
-            </p>
-
-            <small>
-              21:40
-            </small>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- MESSAGE INPUT -->
-
-      <footer class="message-input">
-
-        <button
-          class="attach"
-          id="attachButton"
-          type="button"
-        >
-          ＋
+        <button class="icon-btn" id="callButton" type="button" title="Call" aria-label="Call">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.9z"/></svg>
         </button>
-
-
-        <input
-          id="messageInput"
-          type="text"
-          placeholder="Write a message..."
-          autocomplete="off"
-          maxlength="2000"
-        >
-
-
-        <button
-          id="sendButton"
-          type="button"
-        >
-          ➤
+        <button class="icon-btn" id="moreButton" type="button" title="More" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         </button>
-
-      </footer>
-
-    </main>
-
-
-    <!-- RIGHT SIDEBAR -->
-
-    <aside class="members">
-
-      <h3>
-        ONLINE
-      </h3>
-
-
-      <div class="member">
-
-        <div class="avatar">
-          A
-        </div>
-
-        <span>
-          Alex
-        </span>
-
-        <i></i>
-
       </div>
+    </header>
 
+    <section class="messages" id="messages"></section>
 
-      <div class="member">
+    <footer class="message-input">
+      <button class="circle-btn" id="attachButton" type="button" title="Attach" aria-label="Attach">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
 
-        <div class="avatar">
-          J
-        </div>
+      <input id="messageInput" type="text" maxlength="2000" placeholder="Write a message..." autocomplete="off">
 
-        <span>
-          Jasur
-        </span>
+      <button class="send-btn" id="sendButton" type="button" title="Send" aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m4 4 16 8-16 8 3-8-3-8z"/><path d="M7 12h13"/></svg>
+      </button>
+    </footer>
+  </main>
 
-        <i></i>
+  <aside class="members">
+    <h3>ONLINE</h3>
+    <div id="membersList"></div>
+  </aside>
+</div>
 
-      </div>
-
-
-      <div class="member">
-
-        <div class="avatar">
-          M
-        </div>
-
-        <span>
-          Madina
-        </span>
-
-        <i></i>
-
-      </div>
-
-    </aside>
-
+<div id="modalOverlay" class="overlay">
+  <div class="modal">
+    <h3 id="modalTitle">DESSENJER</h3>
+    <p id="modalText"></p>
+    <div class="modal-actions">
+      <button id="modalClose" type="button">Close</button>
+      <button id="modalPrimary" class="primary" type="button">OK</button>
+    </div>
   </div>
-
-
-  <!-- =========================
-       SUPABASE
-       FALLBACK CDN
-  ========================== -->
-
-<!-- ========================================
-     SUPABASE
-======================================== -->
+</div>
+<div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-  const SUPABASE_URL =
-    "https://itdbusdpkgcxyxzbfrjn.supabase.co";
+/* =========================================================
+   DESSENJER — ALL-IN-ONE VERSION
+   Uses the same Supabase project already in the repository.
+   The browser-safe anon/publishable key is intended for client use.
+   Never put a service_role/secret key here.
+========================================================= */
 
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGJ1c2Rwa2djeHl4emJmcmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NzU0NjIsImV4cCI6MjEwMzI1MTQ2Mn0.rBOF9muR_S2xba_8x-6AObMOs7clvyleKG9c8TnZYAc";
+const SUPABASE_URL = "https://itdbusdpkgcxyxzbfrjn.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGJ1c2Rwa2djeHl4emJmcmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NzU0NjIsImV4cCI6MjEwMzI1MTQ2Mn0.rBOF9muR_S2xba_8x-6AObMOs7clvyleKG9c8TnZYAc";
 
-  window.supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
+if (!window.supabase || typeof window.supabase.createClient !== "function") {
+  throw new Error("Supabase kutubxonasi yuklanmadi.");
+}
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const $ = id => document.getElementById(id);
+
+const authScreen = $("authScreen");
+const app = $("app");
+const authForm = $("authForm");
+const authButton = $("authButton");
+const authMessage = $("authMessage");
+const loginTab = $("loginTab");
+const registerTab = $("registerTab");
+const usernameInput = $("usernameInput");
+const emailInput = $("emailInput");
+const passwordInput = $("passwordInput");
+const logoutButton = $("logoutButton");
+const profileName = $("profileName");
+const profileAvatar = $("profileAvatar");
+const messageInput = $("messageInput");
+const sendButton = $("sendButton");
+const messages = $("messages");
+const searchInput = $("searchInput");
+const chatList = $("chatList");
+const chatTitle = $("chatTitle");
+const chatStatus = $("chatStatus");
+const membersList = $("membersList");
+
+let registerMode = false;
+let currentUser = null;
+let currentProfile = null;
+let selectedUser = null;
+let searchTimer = null;
+let realtimeChannel = null;
+
+function escapeHTML(value){
+  const div = document.createElement("div");
+  div.textContent = value ?? "";
+  return div.innerHTML;
+}
+
+function showAuthMessage(text){
+  authMessage.textContent = text || "";
+}
+
+function setLoading(loading){
+  authButton.disabled = loading;
+  authButton.textContent = loading ? "Loading..." : (registerMode ? "Register" : "Login");
+}
+
+function toast(text){
+  const el = $("toast");
+  el.textContent = text;
+  el.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => el.classList.remove("show"), 2400);
+}
+
+function openModal(title, text, primaryText="OK"){
+  $("modalTitle").textContent = title;
+  $("modalText").textContent = text;
+  $("modalPrimary").textContent = primaryText;
+  $("modalOverlay").classList.add("show");
+}
+
+function closeModal(){
+  $("modalOverlay").classList.remove("show");
+}
+
+$("modalClose").addEventListener("click", closeModal);
+$("modalPrimary").addEventListener("click", closeModal);
+$("modalOverlay").addEventListener("click", e => {
+  if(e.target === $("modalOverlay")) closeModal();
+});
+
+loginTab.addEventListener("click", () => {
+  registerMode = false;
+  loginTab.classList.add("active");
+  registerTab.classList.remove("active");
+  usernameInput.hidden = true;
+  usernameInput.required = false;
+  passwordInput.autocomplete = "current-password";
+  showAuthMessage("");
+  authButton.textContent = "Login";
+});
+
+registerTab.addEventListener("click", () => {
+  registerMode = true;
+  registerTab.classList.add("active");
+  loginTab.classList.remove("active");
+  usernameInput.hidden = false;
+  usernameInput.required = true;
+  passwordInput.autocomplete = "new-password";
+  showAuthMessage("");
+  authButton.textContent = "Register";
+});
+
+authForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  showAuthMessage("");
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const username = usernameInput.value.trim();
+
+  if(registerMode){
+    if(username.length < 3){
+      showAuthMessage("Username kamida 3 ta belgidan iborat bo‘lsin.");
+      return;
+    }
+    await registerUser(email,password,username);
+  }else{
+    await loginUser(email,password);
+  }
+});
+
+async function registerUser(email,password,username){
+  setLoading(true);
+
+  const {data,error} = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options:{data:{username}}
+  });
+
+  if(error){
+    setLoading(false);
+    showAuthMessage(error.message);
+    return;
+  }
+
+  if(!data.user){
+    setLoading(false);
+    showAuthMessage("Account yaratilmadi.");
+    return;
+  }
+
+  /*
+    Agar Supabase Dashboard'da "Confirm email" ON bo‘lsa,
+    Supabase session bermaydi. Uni OFF qilish kerak.
+  */
+  if(!data.session){
+    setLoading(false);
+    showAuthMessage("Supabase → Authentication → Providers → Email → Confirm email ni OFF qiling.");
+    return;
+  }
+
+  currentUser = data.user;
+  currentProfile = await getProfile(currentUser.id);
+
+  if(!currentProfile){
+    currentProfile = await createProfile(
+      currentUser.id,
+      username
     );
+  }
 
-  console.log("DESSENJER: Supabase connected");
+  setLoading(false);
+
+  if(!currentProfile){
+    showAuthMessage("Profil yaratilmadi. Profiles jadvalidagi RLS/policylarni tekshiring.");
+    return;
+  }
+
+  await showApp();
+}
+
+async function loginUser(email,password){
+  setLoading(true);
+
+  const {data,error} = await supabaseClient.auth.signInWithPassword({
+    email,password
+  });
+
+  if(error){
+    setLoading(false);
+    showAuthMessage(error.message);
+    return;
+  }
+
+  currentUser = data.user;
+  currentProfile = await getProfile(currentUser.id);
+
+  if(!currentProfile){
+    const username =
+      currentUser.user_metadata?.username ||
+      currentUser.email?.split("@")[0] ||
+      "User";
+    currentProfile = await createProfile(currentUser.id,username);
+  }
+
+  setLoading(false);
+  await showApp();
+}
+
+async function createProfile(userId,username){
+  const {data,error} = await supabaseClient
+    .from("profiles")
+    .insert({
+      id:userId,
+      username,
+      status:"online"
+    })
+    .select()
+    .single();
+
+  if(error){
+    console.error("Profile create error:",error);
+    return null;
+  }
+  return data;
+}
+
+async function getProfile(userId){
+  const {data,error} = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id",userId)
+    .maybeSingle();
+
+  if(error){
+    console.error("Profile load error:",error);
+    return null;
+  }
+  return data;
+}
+
+async function updateOnlineStatus(status){
+  if(!currentUser) return;
+  await supabaseClient
+    .from("profiles")
+    .update({status})
+    .eq("id",currentUser.id);
+}
+
+async function showApp(){
+  if(!currentUser) return;
+
+  authScreen.style.display = "none";
+  app.hidden = false;
+
+  const username =
+    currentProfile?.username ||
+    currentUser.user_metadata?.username ||
+    currentUser.email?.split("@")[0] ||
+    "User";
+
+  profileName.textContent = username;
+  profileAvatar.textContent = username.charAt(0).toUpperCase();
+
+  await updateOnlineStatus("online");
+  await loadMessages();
+  await loadOnlineMembers();
+  setupRealtime();
+
+  messageInput.focus();
+}
+
+async function logout(){
+  await updateOnlineStatus("offline");
+
+  if(realtimeChannel){
+    await supabaseClient.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+
+  await supabaseClient.auth.signOut();
+
+  currentUser = null;
+  currentProfile = null;
+  selectedUser = null;
+
+  app.hidden = true;
+  authScreen.style.display = "grid";
+  authForm.reset();
+  loginTab.click();
+  messages.innerHTML = "";
+}
+
+logoutButton.addEventListener("click",logout);
+
+async function loadMessages(){
+  const {data,error} = await supabaseClient
+    .from("messages")
+    .select("*")
+    .order("created_at",{ascending:true});
+
+  if(error){
+    console.error("Messages error:",error);
+    toast("Xabarlarni yuklashda xatolik");
+    return;
+  }
+
+  messages.innerHTML = "";
+  (data || []).forEach(renderMessage);
+  scrollMessages();
+}
+
+function renderMessage(message){
+  const username =
+    currentProfile?.username ||
+    currentUser?.user_metadata?.username ||
+    currentUser?.email?.split("@")[0] ||
+    "User";
+
+  const isMine = message.username === username;
+  const el = document.createElement("div");
+  el.className = "message " + (isMine ? "sent" : "received");
+
+  const name = message.username || "User";
+  const letter = name.charAt(0).toUpperCase();
+  const time = new Date(message.created_at).toLocaleTimeString("uz-UZ",{
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+
+  el.innerHTML = `
+    <div class="avatar">${escapeHTML(letter)}</div>
+    <div>
+      <strong>${escapeHTML(isMine ? "You" : name)}</strong>
+      <p>${escapeHTML(message.content)}</p>
+      <small>${escapeHTML(time)}</small>
+    </div>
+  `;
+
+  messages.appendChild(el);
+}
+
+function scrollMessages(){
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function sendMessage(){
+  const content = messageInput.value.trim();
+  if(!content || !currentUser) return;
+
+  const username =
+    currentProfile?.username ||
+    currentUser.user_metadata?.username ||
+    currentUser.email?.split("@")[0] ||
+    "User";
+
+  sendButton.disabled = true;
+
+  const {error} = await supabaseClient
+    .from("messages")
+    .insert({username,content});
+
+  sendButton.disabled = false;
+
+  if(error){
+    console.error("Send message error:",error);
+    toast("Xabar yuborilmadi");
+    return;
+  }
+
+  messageInput.value = "";
+  messageInput.focus();
+}
+
+sendButton.addEventListener("click",sendMessage);
+
+messageInput.addEventListener("keydown",e => {
+  if(e.key === "Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+function setupRealtime(){
+  if(realtimeChannel) return;
+
+  realtimeChannel = supabaseClient
+    .channel("dessenjer-messages")
+    .on(
+      "postgres_changes",
+      {
+        event:"INSERT",
+        schema:"public",
+        table:"messages"
+      },
+      payload => {
+        renderMessage(payload.new);
+        scrollMessages();
+      }
+    )
+    .subscribe();
+}
+
+searchInput.addEventListener("input",() => {
+  clearTimeout(searchTimer);
+
+  const query = searchInput.value.trim();
+
+  if(!query){
+    showDefaultChats();
+    return;
+  }
+
+  searchTimer = setTimeout(() => searchUsers(query),300);
+});
+
+async function searchUsers(query){
+  if(!currentUser) return;
+
+  const {data,error} = await supabaseClient
+    .from("profiles")
+    .select("id,username,status")
+    .ilike("username",`%${query}%`)
+    .neq("id",currentUser.id)
+    .limit(15);
+
+  if(error){
+    console.error("Search error:",error);
+    toast("User qidirishda xatolik");
+    return;
+  }
+
+  renderSearchResults(data || []);
+}
+
+function renderSearchResults(users){
+  chatList.innerHTML = "";
+
+  if(!users.length){
+    chatList.innerHTML = `<div class="search-empty">User topilmadi</div>`;
+    return;
+  }
+
+  users.forEach(user => {
+    const el = document.createElement("div");
+    el.className = "chat";
+    el.innerHTML = `
+      <div class="avatar">${escapeHTML(user.username.charAt(0).toUpperCase())}</div>
+      <div class="chat-info">
+        <strong>${escapeHTML(user.username)}</strong>
+        <span>${user.status === "online" ? "● Online" : "Offline"}</span>
+      </div>
+    `;
+
+    el.addEventListener("click",() => selectUser(user,el));
+    chatList.appendChild(el);
+  });
+}
+
+function selectUser(user,element){
+  document.querySelectorAll(".chat").forEach(x => x.classList.remove("active"));
+  element.classList.add("active");
+
+  selectedUser = user;
+  chatTitle.textContent = user.username;
+  chatStatus.textContent = user.status === "online" ? "● Online" : "● Offline";
+  chatStatus.style.color = user.status === "online" ? "var(--green)" : "var(--muted)";
+
+  toast(user.username + " tanlandi");
+}
+
+function showDefaultChats(){
+  chatList.innerHTML = "";
+
+  const defaults = [
+    {username:"Alex",status:"online",letter:"A"},
+    {username:"Jasur",status:"online",letter:"J"},
+    {username:"Madina",status:"online",letter:"M"}
+  ];
+
+  defaults.forEach((user,index) => {
+    const el = document.createElement("div");
+    el.className = "chat" + (index === 0 ? " active" : "");
+    el.innerHTML = `
+      <div class="avatar">${user.letter}</div>
+      <div class="chat-info">
+        <strong>${user.username}</strong>
+        <span>${user.status === "online" ? "● Online" : "Offline"}</span>
+      </div>
+    `;
+    el.addEventListener("click",() => {
+      document.querySelectorAll(".chat").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+      chatTitle.textContent = user.username;
+      chatStatus.textContent = "● Online";
+      chatStatus.style.color = "var(--green)";
+    });
+    chatList.appendChild(el);
+  });
+}
+
+async function loadOnlineMembers(){
+  const {data,error} = await supabaseClient
+    .from("profiles")
+    .select("id,username,status")
+    .eq("status","online")
+    .limit(30);
+
+  if(error){
+    console.error("Members error:",error);
+    return;
+  }
+
+  membersList.innerHTML = "";
+
+  (data || []).forEach(user => {
+    if(currentUser && user.id === currentUser.id) return;
+
+    const el = document.createElement("div");
+    el.className = "member";
+    el.innerHTML = `
+      <div class="avatar">${escapeHTML(user.username.charAt(0).toUpperCase())}</div>
+      <span>${escapeHTML(user.username)}</span>
+      <i></i>
+    `;
+    membersList.appendChild(el);
+  });
+}
+
+$("searchButton").addEventListener("click",() => {
+  searchInput.focus();
+  if(window.innerWidth < 850){
+    searchInput.style.fontSize = "13px";
+    searchInput.style.textIndent = "0";
+  }
+  toast("Search maydoniga user nomini yozing");
+});
+
+$("callButton").addEventListener("click",() => {
+  const name = selectedUser?.username || chatTitle.textContent;
+  openModal("Voice Call",name + " bilan ovozli qo‘ng‘iroq oynasi tayyor. Haqiqiy audio qo‘ng‘iroq uchun WebRTC/signaling backend kerak bo‘ladi.","Tushundim");
+});
+
+$("moreButton").addEventListener("click",() => {
+  openModal("Chat menu","Bu yerga keyingi bosqichda Pin, Mute, Clear chat va boshqa amallar qo‘shiladi.","Yopish");
+});
+
+$("attachButton").addEventListener("click",() => {
+  openModal("Attachments","Fayl, rasm va video yuborish funksiyasini keyingi bosqichda Supabase Storage bilan ulash mumkin.","Yopish");
+});
+
+document.addEventListener("visibilitychange",async() => {
+  if(!currentUser) return;
+  await updateOnlineStatus(document.hidden ? "offline" : "online");
+});
+
+window.addEventListener("beforeunload",() => {
+  if(currentUser){
+    supabaseClient.from("profiles").update({status:"offline"}).eq("id",currentUser.id);
+  }
+});
+
+supabaseClient.auth.onAuthStateChange(async(event,session) => {
+  if(session?.user && !currentUser){
+    currentUser = session.user;
+    currentProfile = await getProfile(currentUser.id);
+
+    if(!currentProfile){
+      const username =
+        currentUser.user_metadata?.username ||
+        currentUser.email?.split("@")[0] ||
+        "User";
+      currentProfile = await createProfile(currentUser.id,username);
+    }
+
+    await showApp();
+  }
+
+  if(event === "SIGNED_OUT"){
+    currentUser = null;
+    currentProfile = null;
+  }
+});
+
+async function startApp(){
+  const {data,error} = await supabaseClient.auth.getSession();
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  if(data.session?.user){
+    currentUser = data.session.user;
+    currentProfile = await getProfile(currentUser.id);
+
+    if(!currentProfile){
+      const username =
+        currentUser.user_metadata?.username ||
+        currentUser.email?.split("@")[0] ||
+        "User";
+      currentProfile = await createProfile(currentUser.id,username);
+    }
+
+    await showApp();
+  }else{
+    app.hidden = true;
+    authScreen.style.display = "grid";
+    showDefaultChats();
+  }
+}
+
+showDefaultChats();
+startApp();
 </script>
-
-
-<!-- ========================================
-     API
-======================================== -->
-
-<script src="./api/api.js"></script>
-
-
-<!-- ========================================
-     APP
-======================================== -->
-
-<script src="./js/app.js"></script>
+</body>
+      </html>
