@@ -425,8 +425,11 @@
        FALLBACK CDN
   ========================== -->
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- ========================================
+     SUPABASE
+======================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
   const SUPABASE_URL =
@@ -434,12 +437,6 @@
 
   const SUPABASE_ANON_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGJ1c2Rwa2djeHl4emJmcmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NzU0NjIsImV4cCI6MjEwMzI1MTQ2Mn0.rBOF9muR_S2xba_8x-6AObMOs7clvyleKG9c8TnZYAc";
-  if (!window.supabase) {
-    document.body.innerHTML =
-      "<h2 style='color:red;text-align:center'>Supabase yuklanmadi</h2>";
-
-    throw new Error("Supabase library yuklanmadi");
-  }
 
   window.supabaseClient =
     window.supabase.createClient(
@@ -447,11 +444,19 @@
       SUPABASE_ANON_KEY
     );
 
-  console.log("DESSENJER: Supabase OK");
+  console.log("DESSENJER: Supabase connected");
 </script>
 
-<!-- API -->
+
+<!-- ========================================
+     API
+======================================== -->
+
 <script src="./api/api.js"></script>
 
-<!-- APP -->
+
+<!-- ========================================
+     APP
+======================================== -->
+
 <script src="./js/app.js"></script>
