@@ -2,888 +2,3497 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07111f">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#07101f">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>DESSENJER</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+/* =========================================================
+   DESSENJER — TELEGRAM STYLE / TECH BLUE
+========================================================= */
+
 :root{
-  --bg:#050b14;
-  --panel:#0a1422;
-  --panel2:#0d1a2b;
-  --line:rgba(115,164,220,.16);
-  --text:#f5f8ff;
-  --muted:#8393aa;
+  --bg:#07101f;
+  --bg2:#091426;
+  --panel:#0b1729;
+  --panel2:#0e1c31;
+  --border:#182c49;
   --blue:#1683ff;
-  --blue2:#0068e8;
-  --cyan:#48b9ff;
-  --green:#31d27c;
-  --danger:#ff526d;
-  --shadow:0 18px 60px rgba(0,0,0,.35);
-  --radius:22px;
-}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input{font:inherit}
-button{border:0;color:inherit;cursor:pointer}
-body{overflow:hidden;background:
- radial-gradient(circle at 70% -10%,rgba(22,131,255,.16),transparent 30%),
- linear-gradient(180deg,#07111f 0%,#050b14 100%)}
-
-/* AUTH */
-.auth-screen{position:fixed;inset:0;display:grid;place-items:center;padding:22px;background:
- radial-gradient(circle at 50% 20%,rgba(24,132,255,.18),transparent 35%),
- #050b14;z-index:20}
-.auth-card{width:min(430px,100%);padding:34px;border:1px solid var(--line);border-radius:30px;background:rgba(10,20,34,.84);backdrop-filter:blur(26px);box-shadow:var(--shadow)}
-.auth-logo,.logo{display:grid;place-items:center;background:linear-gradient(145deg,#258fff,#0067df);box-shadow:0 10px 35px rgba(22,131,255,.3)}
-.auth-logo{width:72px;height:72px;border-radius:24px;font-size:34px;font-weight:800;margin:0 auto 20px}
-.auth-card h1{text-align:center;margin:0;font-size:30px;letter-spacing:-1px}
-.auth-subtitle{text-align:center;color:var(--muted);margin:9px 0 25px}
-.auth-tabs{display:grid;grid-template-columns:1fr 1fr;padding:4px;background:#07111e;border-radius:14px;margin-bottom:16px}
-.auth-tabs button{padding:11px;border-radius:11px;background:transparent;color:var(--muted)}
-.auth-tabs button.active{background:#13253a;color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.2)}
-#authForm{display:grid;gap:11px}
-#authForm input{width:100%;padding:15px 16px;border-radius:15px;border:1px solid var(--line);outline:none;background:#07111e;color:#fff}
-#authForm input:focus{border-color:rgba(22,131,255,.75);box-shadow:0 0 0 4px rgba(22,131,255,.1)}
-#authButton{padding:15px;border-radius:15px;background:linear-gradient(135deg,#258fff,#0068e8);font-weight:750;box-shadow:0 10px 30px rgba(22,131,255,.22)}
-#authButton:disabled{opacity:.6}
-#authMessage{text-align:center;min-height:20px;color:#ff8094;margin:14px 0 0;font-size:14px}
-
-/* APP */
-.app{height:100dvh;display:grid;grid-template-columns:82px minmax(0,1fr) 250px;background:rgba(5,11,20,.82)}
-.sidebar{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line);background:rgba(8,18,31,.86);backdrop-filter:blur(24px)}
-.brand{height:76px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
-.brand span{display:none}
-.logo{width:50px;height:50px;border-radius:16px;font-size:24px;font-weight:800}
-.search{padding:14px 10px}
-.search input{width:100%;height:42px;border:1px solid var(--line);border-radius:13px;background:#07111e;color:#fff;outline:none;padding:0 12px}
-.search input::placeholder{color:#687a92}
-.section-title{display:none}
-#chatList{overflow:auto;padding:4px 8px}
-.chat{display:flex;align-items:center;gap:11px;padding:9px;border-radius:17px;margin:3px 0;transition:.2s}
-.chat:hover,.chat.active{background:rgba(28,107,190,.14)}
-.chat.active{box-shadow:inset 3px 0 0 var(--blue)}
-.avatar{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#268dff,#0065df);font-weight:750;box-shadow:0 8px 22px rgba(0,104,232,.22)}
-.chat-info{display:none;min-width:0}
-.chat-info strong,.chat-info span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chat-info span{font-size:12px;color:var(--muted);margin-top:3px}
-.profile{margin-top:auto;padding:13px 9px;border-top:1px solid var(--line);display:flex;justify-content:center;align-items:center;gap:10px}
-.profile-info{display:none;min-width:0}
-.profile-info strong,.profile-info span{display:block}
-.profile-info span{font-size:12px;color:var(--green);margin-top:3px}
-#logoutButton{width:38px;height:38px;border-radius:12px;background:#0d1b2d;color:#9aabc0;display:grid;place-items:center}
-
-/* CHAT */
-.chat-window{min-width:0;display:grid;grid-template-rows:76px minmax(0,1fr) 80px;background:linear-gradient(180deg,rgba(7,15,27,.9),rgba(3,9,17,.96))}
-.chat-header{display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--line);background:rgba(8,17,29,.7);backdrop-filter:blur(18px)}
-.chat-header h2{margin:0;font-size:20px;letter-spacing:-.4px}
-.status{display:block;color:var(--green);font-size:13px;margin-top:4px}
-.header-actions{display:flex;gap:9px}
-.icon-btn{width:46px;height:46px;border-radius:15px;background:#0d1929;border:1px solid rgba(128,168,218,.08);display:grid;place-items:center;transition:.2s}
-.icon-btn:hover{background:#12243a;transform:translateY(-1px)}
-.icon-btn svg{width:20px;height:20px;stroke:currentColor}
-.messages{overflow:auto;padding:28px 5%;display:flex;flex-direction:column;gap:14px}
-.message{display:flex;gap:10px;align-items:flex-end;max-width:78%}
-.message.sent{align-self:flex-end;flex-direction:row-reverse}
-.message.received{align-self:flex-start}
-.message>div:last-child{min-width:0}
-.message strong{display:block;font-size:13px;color:#c8d5e7;margin:0 0 6px 7px}
-.message.sent strong{text-align:right;margin-right:7px}
-.message p{margin:0;padding:12px 15px;border-radius:18px 18px 18px 6px;background:#0e1c2e;border:1px solid var(--line);line-height:1.4;overflow-wrap:anywhere}
-.message.sent p{background:linear-gradient(145deg,#187ff1,#0668d9);border-color:transparent;border-radius:18px 18px 6px 18px}
-.message small{display:block;color:#718199;font-size:11px;margin:5px 7px 0}
-.message.sent small{text-align:right}
-.message .avatar{width:34px;height:34px;flex-basis:34px;font-size:13px}
-.message-input{display:grid;grid-template-columns:52px minmax(0,1fr) 58px;gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--line);background:rgba(7,15,27,.88);backdrop-filter:blur(20px)}
-.message-input input{height:54px;border-radius:18px;border:1px solid rgba(40,139,255,.7);background:#081524;color:#fff;outline:none;padding:0 17px;box-shadow:0 0 0 3px rgba(22,131,255,.05)}
-.message-input input::placeholder{color:#718199}
-.circle-btn{height:52px;width:52px;border-radius:17px;background:#0d1b2d;border:1px solid var(--line);display:grid;place-items:center}
-.send-btn{height:54px;width:58px;border-radius:18px;background:linear-gradient(145deg,#258fff,#0068e8);display:grid;place-items:center;box-shadow:0 10px 28px rgba(22,131,255,.24)}
-.send-btn svg{width:22px}
-
-/* MEMBERS */
-.members{border-left:1px solid var(--line);background:rgba(8,18,31,.75);padding:25px 18px;overflow:auto}
-.members h3{font-size:11px;letter-spacing:1.5px;color:#70819a;margin:0 0 15px}
-.member{display:flex;align-items:center;gap:11px;padding:10px;border-radius:14px}
-.member:hover{background:rgba(28,107,190,.1)}
-.member .avatar{width:38px;height:38px;flex-basis:38px;font-size:13px}
-.member span{font-size:14px;flex:1}
-.member i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(49,210,124,.5)}
-.search-empty{padding:20px 8px;color:var(--muted);font-size:13px;text-align:center}
-
-/* MODALS / TOAST */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
-.overlay.show{display:flex}
-.modal{width:min(390px,100%);padding:24px;border-radius:24px;border:1px solid var(--line);background:#0a1626;box-shadow:var(--shadow)}
-.modal h3{margin:0 0 8px}.modal p{color:var(--muted);line-height:1.5}
-.modal-actions{display:flex;gap:10px;margin-top:18px}
-.modal-actions button{flex:1;padding:12px;border-radius:13px;background:#102239}
-.modal-actions .primary{background:var(--blue)}
-.toast{position:fixed;left:50%;bottom:94px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#112239;border:1px solid var(--line);padding:11px 15px;border-radius:13px;z-index:80;transition:.25s;box-shadow:var(--shadow);font-size:13px}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-
-/* DESKTOP */
-@media(min-width:850px){
-  .sidebar{min-width:250px}
-  .brand{justify-content:flex-start;padding:0 18px;gap:12px}
-  .brand span{display:block;font-weight:800;letter-spacing:.5px}
-  .chat-info,.profile-info{display:block}
-  .profile{justify-content:flex-start;padding:14px}
+  --blue2:#0875f5;
+  --blue-soft:rgba(22,131,255,.15);
+  --text:#f5f8ff;
+  --muted:#7e8da6;
+  --green:#28df89;
+  --danger:#ff5d6c;
+  --shadow:0 10px 35px rgba(0,0,0,.3);
 }
 
-/* MOBILE */
-@media(max-width:849px){
-  .app{grid-template-columns:70px minmax(0,1fr)}
-  .members{display:none}
-  .sidebar{width:70px}
-  .search{padding:10px 8px}
-  .search input{font-size:0;padding:0;text-indent:-999px}
-  .search input:focus{font-size:13px;text-indent:0;padding:0 10px}
-  .chat{justify-content:center;padding:8px}
-  .chat.active{box-shadow:none}
-  .chat .avatar{width:48px;height:48px;flex-basis:48px}
-  .profile{padding:11px 7px}
-  #logoutButton{display:none}
-  .chat-header{padding:0 12px}
-  .header-actions{gap:6px}
-  .icon-btn{width:42px;height:42px;border-radius:14px}
-  .messages{padding:22px 14px}
-  .message{max-width:88%}
-  .message-input{padding:10px 9px;grid-template-columns:48px minmax(0,1fr) 54px;gap:7px}
-  .circle-btn{width:48px;height:48px}
-  .send-btn{width:54px;height:50px}
-  .message-input input{height:50px;border-radius:17px;min-width:0}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
-@media(max-width:430px){
-  .app{grid-template-columns:64px minmax(0,1fr)}
-  .sidebar{width:64px}
-  .chat-header h2{font-size:18px}
-  .header-actions .icon-btn:nth-child(3){display:none}
-  .messages{padding-left:10px;padding-right:10px}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+#authScreen{
+  width:100%;
+  height:100%;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at 50% 20%,rgba(22,131,255,.18),transparent 35%),
+    linear-gradient(145deg,#050b16,#09172a 55%,#06101f);
+}
+
+.auth-card{
+  width:min(420px,100%);
+  padding:34px 28px 30px;
+  border:1px solid rgba(60,120,190,.2);
+  border-radius:28px;
+  background:rgba(9,21,38,.92);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.45),
+    inset 0 1px rgba(255,255,255,.03);
+  backdrop-filter:blur(25px);
+}
+
+.auth-logo{
+  width:70px;
+  height:70px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:0 auto 18px;
+  border-radius:22px;
+  background:linear-gradient(145deg,#1b8aff,#0865e5);
+  font-size:38px;
+  font-weight:800;
+  box-shadow:0 12px 35px rgba(0,119,255,.35);
+}
+
+.auth-card h1{
+  margin:0;
+  text-align:center;
+  font-size:28px;
+  letter-spacing:1px;
+}
+
+.auth-subtitle{
+  margin:9px 0 26px;
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.auth-tabs{
+  display:flex;
+  padding:4px;
+  margin-bottom:18px;
+  border-radius:13px;
+  background:#07101e;
+}
+
+.auth-tabs button{
+  flex:1;
+  padding:11px;
+  border-radius:10px;
+  background:transparent;
+  color:var(--muted);
+}
+
+.auth-tabs button.active{
+  color:white;
+  background:#142944;
+  box-shadow:0 4px 15px rgba(0,0,0,.2);
+}
+
+#authForm{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+#authForm input{
+  width:100%;
+  padding:14px 15px;
+  outline:none;
+  border:1px solid var(--border);
+  border-radius:13px;
+  color:white;
+  background:#071222;
+  transition:.2s;
+}
+
+#authForm input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(22,131,255,.1);
+}
+
+#authButton{
+  padding:14px;
+  margin-top:4px;
+  border-radius:13px;
+  color:white;
+  font-weight:700;
+  background:linear-gradient(135deg,#1688ff,#0769df);
+  box-shadow:0 10px 25px rgba(0,112,255,.25);
+}
+
+#authButton:disabled{
+  opacity:.6;
+}
+
+#authMessage{
+  min-height:20px;
+  margin:14px 0 0;
+  text-align:center;
+  color:#ff7180;
+  font-size:13px;
+}
+
+/* =========================================================
+   APP
+========================================================= */
+
+#app{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:310px 1fr;
+  background:var(--bg);
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid var(--border);
+  background:#081321;
+}
+
+.sidebar-top{
+  padding:18px 16px 12px;
+  border-bottom:1px solid rgba(30,52,82,.55);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin-bottom:17px;
+}
+
+.brand-logo{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:13px;
+  background:linear-gradient(145deg,#198bff,#0868e8);
+  font-weight:800;
+  font-size:21px;
+  box-shadow:0 8px 22px rgba(0,120,255,.25);
+}
+
+.brand span{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+
+.search-box{
+  position:relative;
+}
+
+.search-box svg{
+  position:absolute;
+  width:19px;
+  height:19px;
+  left:13px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#7386a2;
+  pointer-events:none;
+}
+
+#searchInput{
+  width:100%;
+  height:44px;
+  padding:0 14px 0 42px;
+  outline:none;
+  border:1px solid transparent;
+  border-radius:13px;
+  color:white;
+  background:#0d1c30;
+  transition:.2s;
+}
+
+#searchInput:focus{
+  border-color:#1a5c9e;
+  background:#0e2038;
+}
+
+.section-label{
+  padding:15px 5px 8px;
+  color:#667994;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.2px;
+}
+
+.chat-list{
+  flex:1;
+  overflow:auto;
+  padding:4px 8px;
+}
+
+.chat-list::-webkit-scrollbar,
+.messages::-webkit-scrollbar{
+  width:5px;
+}
+
+.chat-list::-webkit-scrollbar-thumb,
+.messages::-webkit-scrollbar-thumb{
+  border-radius:10px;
+  background:#19304e;
+}
+
+.chat-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:70px;
+  padding:9px 10px;
+  margin-bottom:3px;
+  border-radius:14px;
+  color:white;
+  transition:.15s;
+}
+
+.chat-item:hover{
+  background:#0e2037;
+}
+
+.chat-item.active{
+  background:linear-gradient(
+    90deg,
+    rgba(22,131,255,.19),
+    rgba(22,131,255,.08)
+  );
+  box-shadow:inset 3px 0 var(--blue);
+}
+
+.avatar{
+  position:relative;
+  width:50px;
+  height:50px;
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:linear-gradient(145deg,#1687ff,#075fdb);
+  color:white;
+  font-size:20px;
+  font-weight:700;
+}
+
+.avatar.small{
+  width:42px;
+  height:42px;
+  font-size:17px;
+}
+
+.avatar.online::after{
+  content:"";
+  position:absolute;
+  width:11px;
+  height:11px;
+  right:1px;
+  bottom:1px;
+  border:2px solid #081321;
+  border-radius:50%;
+  background:var(--green);
+}
+
+.chat-text{
+  min-width:0;
+  flex:1;
+}
+
+.chat-name{
+  display:block;
+  margin-bottom:5px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-weight:700;
+}
+
+.chat-preview{
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#73859f;
+  font-size:13px;
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:13px;
+  border-top:1px solid var(--border);
+  background:#081321;
+}
+
+.profile-info{
+  flex:1;
+  min-width:0;
+}
+
+.profile-name{
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-weight:700;
+}
+
+.profile-status{
+  display:block;
+  margin-top:4px;
+  color:var(--green);
+  font-size:12px;
+}
+
+.icon-button{
+  width:40px;
+  height:40px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:12px;
+  color:#9aacbf;
+  background:#0d1b2e;
+}
+
+.icon-button:hover{
+  color:white;
+  background:#132944;
+}
+
+/* =========================================================
+   CHAT
+========================================================= */
+
+.chat-window{
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  background:
+    radial-gradient(circle at 50% 0,rgba(19,102,191,.07),transparent 35%),
+    #060e1b;
+}
+
+.chat-header{
+  height:76px;
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  border-bottom:1px solid var(--border);
+  background:rgba(7,16,31,.92);
+  backdrop-filter:blur(15px);
+}
+
+.chat-person{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.header-avatar{
+  display:none;
+}
+
+.chat-title{
+  margin:0 0 4px;
+  font-size:18px;
+}
+
+.chat-status{
+  color:var(--green);
+  font-size:12px;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
+}
+
+.header-btn{
+  width:43px;
+  height:43px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #162b46;
+  border-radius:13px;
+  color:#9db0c8;
+  background:#0b1729;
+  transition:.15s;
+}
+
+.header-btn:hover{
+  color:white;
+  border-color:#275581;
+  background:#10243d;
+}
+
+.header-btn svg{
+  width:20px;
+  height:20px;
+}
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.messages{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:24px clamp(14px,5vw,70px);
+}
+
+.empty-messages{
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  color:#6d7f99;
+}
+
+.message-row{
+  display:flex;
+  margin:5px 0;
+}
+
+.message-row.mine{
+  justify-content:flex-end;
+}
+
+.message{
+  max-width:min(620px,78%);
+}
+
+.message-bubble{
+  padding:10px 14px 7px;
+  border-radius:18px 18px 18px 5px;
+  background:#102139;
+  border:1px solid #193452;
+  box-shadow:0 5px 18px rgba(0,0,0,.15);
+}
+
+.mine .message-bubble{
+  border-radius:18px 18px 5px 18px;
+  border-color:#1674d5;
+  background:linear-gradient(145deg,#1479e8,#0966d1);
+}
+
+.message-author{
+  margin-bottom:3px;
+  color:#52a7ff;
+  font-size:12px;
+  font-weight:700;
+}
+
+.mine .message-author{
+  color:#d9ecff;
+}
+
+.message-content{
+  margin:0;
+  line-height:1.45;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-size:15px;
+}
+
+.message-meta{
+  display:flex;
+  justify-content:flex-end;
+  gap:5px;
+  margin-top:4px;
+  color:#91a2ba;
+  font-size:10px;
+}
+
+.mine .message-meta{
+  color:#d4e8ff;
+}
+
+.message-menu{
+  position:relative;
+}
+
+.message-actions{
+  position:absolute;
+  right:0;
+  top:calc(100% + 5px);
+  z-index:20;
+  min-width:150px;
+  padding:5px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#101e31;
+  box-shadow:var(--shadow);
+}
+
+.message-actions button{
+  width:100%;
+  padding:10px;
+  text-align:left;
+  border-radius:8px;
+  color:#d7e3f4;
+  background:transparent;
+}
+
+.message-actions button:hover{
+  background:#17304d;
+}
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.message-composer{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:13px clamp(12px,4vw,50px);
+  padding-bottom:max(13px,env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);
+  background:#081321;
+}
+
+.composer-btn{
+  width:48px;
+  height:48px;
+  flex:none;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:15px;
+  color:#9cafc5;
+  background:#102038;
+  transition:.15s;
+}
+
+.composer-btn:hover{
+  color:white;
+  background:#15304f;
+}
+
+.composer-btn svg{
+  width:22px;
+  height:22px;
+}
+
+.input-wrap{
+  flex:1;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  border:1px solid #1b385b;
+  border-radius:16px;
+  background:#0b182b;
+  transition:.2s;
+}
+
+.input-wrap:focus-within{
+  border-color:#197ee9;
+  box-shadow:0 0 0 3px rgba(25,126,233,.08);
+}
+
+#messageInput{
+  width:100%;
+  min-width:0;
+  height:48px;
+  padding:0 15px;
+  outline:none;
+  border:0;
+  color:white;
+  background:transparent;
+}
+
+#messageInput::placeholder{
+  color:#687a94;
+}
+
+.send-btn{
+  width:48px;
+  height:48px;
+  flex:none;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:15px;
+  color:white;
+  background:linear-gradient(145deg,#188cff,#0768e1);
+  box-shadow:0 8px 25px rgba(0,112,255,.25);
+}
+
+.send-btn:disabled{
+  opacity:.45;
+  box-shadow:none;
+}
+
+.send-btn svg{
+  width:22px;
+  height:22px;
+}
+
+/* =========================================================
+   SAVED
+========================================================= */
+
+.saved-panel{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(7px);
+}
+
+.saved-panel.open{
+  display:flex;
+  justify-content:flex-end;
+}
+
+.saved-window{
+  width:min(460px,100%);
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  border-left:1px solid var(--border);
+  background:#081321;
+  box-shadow:-20px 0 60px rgba(0,0,0,.35);
+}
+
+.saved-header{
+  height:75px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:0 17px;
+  border-bottom:1px solid var(--border);
+}
+
+.saved-header h2{
+  margin:0;
+  font-size:18px;
+}
+
+.saved-content{
+  flex:1;
+  overflow:auto;
+  padding:15px;
+}
+
+.saved-empty{
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  color:#71839c;
+}
+
+.saved-message{
+  padding:13px;
+  margin-bottom:9px;
+  border:1px solid #18314f;
+  border-radius:15px;
+  background:#0c1b2e;
+}
+
+.saved-message-text{
+  margin:0 0 7px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+
+.saved-message-time{
+  color:#71839c;
+  font-size:11px;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-results-label{
+  padding:10px 8px;
+  color:#71839c;
+  font-size:11px;
+  font-weight:700;
+}
+
+.no-results{
+  padding:30px 10px;
+  text-align:center;
+  color:#667994;
+  font-size:13px;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:85px;
+  z-index:200;
+  transform:translate(-50%,20px);
+  padding:11px 17px;
+  border:1px solid #224567;
+  border-radius:12px;
+  opacity:0;
+  pointer-events:none;
+  color:white;
+  background:#11243b;
+  box-shadow:var(--shadow);
+  transition:.25s;
+  font-size:13px;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:760px){
+
+  #app{
+    grid-template-columns:76px 1fr;
+  }
+
+  .sidebar-top{
+    padding:13px 9px;
+  }
+
+  .brand{
+    justify-content:center;
+    margin-bottom:12px;
+  }
+
+  .brand span,
+  .search-box,
+  .section-label,
+  .chat-text,
+  .profile-info{
+    display:none;
+  }
+
+  .chat-list{
+    padding:4px 8px;
+  }
+
+  .chat-item{
+    justify-content:center;
+    padding:9px 0;
+  }
+
+  .chat-item.active{
+    box-shadow:inset 3px 0 var(--blue);
+  }
+
+  .profile{
+    justify-content:center;
+    padding:10px 7px;
+  }
+
+  .profile .icon-button{
+    display:none;
+  }
+
+  .chat-header{
+    height:70px;
+    padding:0 12px;
+  }
+
+  .header-btn{
+    width:40px;
+    height:40px;
+  }
+
+  .header-actions{
+    gap:5px;
+  }
+
+  .messages{
+    padding:18px 10px;
+  }
+
+  .message{
+    max-width:86%;
+  }
+
+  .message-composer{
+    padding:10px 8px;
+  }
+
+  .composer-btn{
+    width:45px;
+    height:45px;
+  }
+
+  .send-btn{
+    width:45px;
+    height:45px;
+  }
+}
+
+@media(max-width:450px){
+
+  .header-btn:nth-child(2){
+    display:none;
+  }
+
+  .chat-title{
+    font-size:17px;
+  }
+
+  .message-content{
+    font-size:14px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div id="authScreen" class="auth-screen">
+<!-- =======================================================
+     AUTH
+======================================================= -->
+
+<section id="authScreen">
+
   <div class="auth-card">
+
     <div class="auth-logo">D</div>
+
     <h1>DESSENJER</h1>
-    <p class="auth-subtitle">Secure. Fast. Connected.</p>
+
+    <p class="auth-subtitle">
+      Secure. Fast. Connected.
+    </p>
 
     <div class="auth-tabs">
-      <button id="loginTab" class="active" type="button">Login</button>
-      <button id="registerTab" type="button">Register</button>
+
+      <button id="loginTab" class="active" type="button">
+        Login
+      </button>
+
+      <button id="registerTab" type="button">
+        Register
+      </button>
+
     </div>
 
     <form id="authForm">
-      <input id="usernameInput" type="text" placeholder="Username" autocomplete="username" hidden>
-      <input id="emailInput" type="email" placeholder="Email" autocomplete="email" required>
-      <input id="passwordInput" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
-      <button id="authButton" type="submit">Login</button>
-    </form>
-    <p id="authMessage"></p>
-  </div>
-</div>
 
-<div id="app" class="app" hidden>
+      <input
+        id="usernameInput"
+        type="text"
+        placeholder="Username"
+        autocomplete="username"
+        minlength="3"
+        hidden
+      >
+
+      <input
+        id="emailInput"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+        required
+      >
+
+      <input
+        id="passwordInput"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+        minlength="6"
+        required
+      >
+
+      <button id="authButton" type="submit">
+        Login
+      </button>
+
+    </form>
+
+    <p id="authMessage"></p>
+
+  </div>
+
+</section>
+
+
+<!-- =======================================================
+     APP
+======================================================= -->
+
+<div id="app" hidden>
+
+  <!-- SIDEBAR -->
 
   <aside class="sidebar">
-    <div class="brand">
-      <div class="logo">D</div>
-      <span>DESSENJER</span>
+
+    <div class="sidebar-top">
+
+      <div class="brand">
+
+        <div class="brand-logo">D</div>
+
+        <span>DESSENJER</span>
+
+      </div>
+
+      <div class="search-box">
+
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"
+          stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-4-4"></path>
+        </svg>
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search"
+          autocomplete="off"
+        >
+
+      </div>
+
     </div>
 
-    <div class="search">
-      <input id="searchInput" type="search" placeholder="Search..." autocomplete="off">
+    <div class="section-label">
+      CHATS
     </div>
 
-    <div class="section-title">CHATS</div>
-    <div id="chatList"></div>
+    <div id="chatList" class="chat-list"></div>
 
     <div class="profile">
-      <div class="avatar" id="profileAvatar">D</div>
-      <div class="profile-info">
-        <strong id="profileName">User</strong>
-        <span>● Online</span>
+
+      <div id="profileAvatar" class="avatar small">
+        D
       </div>
-      <button id="logoutButton" title="Logout" type="button" aria-label="Logout">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-6"/></svg>
+
+      <div class="profile-info">
+
+        <span id="profileName" class="profile-name">
+          User
+        </span>
+
+        <span class="profile-status">
+          ● Online
+        </span>
+
+      </div>
+
+      <button
+        id="savedButton"
+        class="icon-button"
+        type="button"
+        title="Kerakli xabarlar"
+      >
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3z"/>
+        </svg>
       </button>
+
+      <button
+        id="logoutButton"
+        class="icon-button"
+        type="button"
+        title="Logout"
+      >
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"
+          stroke-linecap="round">
+          <path d="M10 17l5-5-5-5"></path>
+          <path d="M15 12H3"></path>
+          <path d="M21 19V5a2 2 0 0 0-2-2h-6"></path>
+        </svg>
+      </button>
+
     </div>
+
   </aside>
+
+
+  <!-- CHAT WINDOW -->
 
   <main class="chat-window">
+
     <header class="chat-header">
-      <div>
-        <h2 id="chatTitle">DESSENJER</h2>
-        <span id="chatStatus" class="status">● Online</span>
+
+      <div class="chat-person">
+
+        <div id="headerAvatar" class="avatar small header-avatar">
+          A
+        </div>
+
+        <div>
+
+          <h2 id="chatTitle" class="chat-title">
+            DESSENJER
+          </h2>
+
+          <span id="chatStatus" class="chat-status">
+            ● Online
+          </span>
+
+        </div>
+
       </div>
+
 
       <div class="header-actions">
-        <button class="icon-btn" id="searchButton" type="button" title="Search" aria-label="Search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+
+        <!-- SEARCH -->
+
+        <button
+          id="headerSearchButton"
+          class="header-btn"
+          type="button"
+          title="Search"
+        >
+          <svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-4-4"></path>
+          </svg>
         </button>
-        <button class="icon-btn" id="callButton" type="button" title="Call" aria-label="Call">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.9z"/></svg>
+
+
+        <!-- CALL UI -->
+
+        <button
+          id="callButton"
+          class="header-btn"
+          type="button"
+          title="Call"
+        >
+          <svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M22 16.9v3a2 2 0 0 1-2.2 2
+              19.8 19.8 0 0 1-8.6-3.1
+              19.5 19.5 0 0 1-6-6
+              19.8 19.8 0 0 1-3.1-8.6
+              A2 2 0 0 1 4.1 2h3
+              a2 2 0 0 1 2 1.7
+              c.1 1 .4 2 .7 2.9
+              a2 2 0 0 1-.5 2.1L8 10
+              a16 16 0 0 0 6 6l1.3-1.3
+              a2 2 0 0 1 2.1-.5
+              c.9.3 1.9.6 2.9.7
+              A2 2 0 0 1 22 16.9z"/>
+          </svg>
         </button>
-        <button class="icon-btn" id="moreButton" type="button" title="More" aria-label="More">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+
+
+        <!-- MORE -->
+
+        <button
+          id="moreButton"
+          class="header-btn"
+          type="button"
+          title="More"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="1.8"/>
+            <circle cx="12" cy="12" r="1.8"/>
+            <circle cx="12" cy="19" r="1.8"/>
+          </svg>
         </button>
+
       </div>
+
     </header>
 
-    <section class="messages" id="messages"></section>
 
-    <footer class="message-input">
-      <button class="circle-btn" id="attachButton" type="button" title="Attach" aria-label="Attach">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    <!-- MESSAGES -->
+
+    <section id="messages" class="messages">
+
+      <div class="empty-messages">
+        <div>
+          <div style="font-size:42px;margin-bottom:12px">D</div>
+          <div>DESSENJER</div>
+          <div style="margin-top:6px;font-size:12px">
+            Xabar yozishni boshlang
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- COMPOSER -->
+
+    <footer class="message-composer">
+
+      <button
+        id="attachButton"
+        class="composer-btn"
+        type="button"
+        title="Attach"
+      >
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M12 5v14"></path>
+          <path d="M5 12h14"></path>
+        </svg>
       </button>
 
-      <input id="messageInput" type="text" maxlength="2000" placeholder="Write a message..." autocomplete="off">
+      <div class="input-wrap">
 
-      <button class="send-btn" id="sendButton" type="button" title="Send" aria-label="Send">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m4 4 16 8-16 8 3-8-3-8z"/><path d="M7 12h13"/></svg>
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Write a message"
+          maxlength="2000"
+          autocomplete="off"
+        >
+
+      </div>
+
+      <button
+        id="sendButton"
+        class="send-btn"
+        type="button"
+        title="Send"
+        disabled
+      >
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M22 2 11 13"></path>
+          <path d="m22 2-7 20-4-9-9-4z"></path>
+        </svg>
       </button>
+
     </footer>
+
   </main>
 
-  <aside class="members">
-    <h3>ONLINE</h3>
-    <div id="membersList"></div>
-  </aside>
 </div>
 
-<div id="modalOverlay" class="overlay">
-  <div class="modal">
-    <h3 id="modalTitle">DESSENJER</h3>
-    <p id="modalText"></p>
-    <div class="modal-actions">
-      <button id="modalClose" type="button">Close</button>
-      <button id="modalPrimary" class="primary" type="button">OK</button>
-    </div>
+
+<!-- =======================================================
+     SAVED MESSAGES
+======================================================= -->
+
+<div id="savedPanel" class="saved-panel">
+
+  <div class="saved-window">
+
+    <header class="saved-header">
+
+      <button
+        id="closeSavedButton"
+        class="icon-button"
+        type="button"
+      >
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"
+          stroke-linecap="round">
+          <path d="M15 18l-6-6 6-6"></path>
+        </svg>
+      </button>
+
+      <div>
+
+        <h2>Kerakli xabarlar</h2>
+
+      </div>
+
+    </header>
+
+    <div id="savedContent" class="saved-content"></div>
+
   </div>
+
 </div>
+
+
 <div id="toast" class="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 /* =========================================================
-   DESSENJER — ALL-IN-ONE VERSION
-   Uses the same Supabase project already in the repository.
-   The browser-safe anon/publishable key is intended for client use.
-   Never put a service_role/secret key here.
+   DESSENJER
+   EVERYTHING IN ONE FILE
 ========================================================= */
 
-const SUPABASE_URL = "https://itdbusdpkgcxyxzbfrjn.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGJ1c2Rwa2djeHl4emJmcmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NzU0NjIsImV4cCI6MjEwMzI1MTQ2Mn0.rBOF9muR_S2xba_8x-6AObMOs7clvyleKG9c8TnZYAc";
 
-if (!window.supabase || typeof window.supabase.createClient !== "function") {
-  throw new Error("Supabase kutubxonasi yuklanmadi.");
-}
+/* =========================================================
+   SUPABASE CONFIG
+========================================================= */
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const SUPABASE_URL =
+  "https://itdbusdpkgcxyxzbf rjn.supabase.co".replace(" ","");
 
-const $ = id => document.getElementById(id);
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZXMiLCJyZWYiOiJpdGRidXNkcGtqY3h5eHpianJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NzU0NjIsImV4cCI6MjEwMzI1MTQ2Mn0.rBOF9muR_S2xba_8x-6AObMOs7clvyleKG9c8TnZYAc";
 
-const authScreen = $("authScreen");
-const app = $("app");
-const authForm = $("authForm");
-const authButton = $("authButton");
-const authMessage = $("authMessage");
-const loginTab = $("loginTab");
-const registerTab = $("registerTab");
-const usernameInput = $("usernameInput");
-const emailInput = $("emailInput");
-const passwordInput = $("passwordInput");
-const logoutButton = $("logoutButton");
-const profileName = $("profileName");
-const profileAvatar = $("profileAvatar");
-const messageInput = $("messageInput");
-const sendButton = $("sendButton");
-const messages = $("messages");
-const searchInput = $("searchInput");
-const chatList = $("chatList");
-const chatTitle = $("chatTitle");
-const chatStatus = $("chatStatus");
-const membersList = $("membersList");
 
-let registerMode = false;
-let currentUser = null;
-let currentProfile = null;
-let selectedUser = null;
-let searchTimer = null;
-let realtimeChannel = null;
+/*
+  MUHIM:
+  window.supabase mavjudligini tekshiramiz.
+  Shundan keyin client yaratamiz.
+*/
 
-function escapeHTML(value){
-  const div = document.createElement("div");
-  div.textContent = value ?? "";
-  return div.innerHTML;
-}
-
-function showAuthMessage(text){
-  authMessage.textContent = text || "";
-}
-
-function setLoading(loading){
-  authButton.disabled = loading;
-  authButton.textContent = loading ? "Loading..." : (registerMode ? "Register" : "Login");
-}
-
-function toast(text){
-  const el = $("toast");
-  el.textContent = text;
-  el.classList.add("show");
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => el.classList.remove("show"), 2400);
-}
-
-function openModal(title, text, primaryText="OK"){
-  $("modalTitle").textContent = title;
-  $("modalText").textContent = text;
-  $("modalPrimary").textContent = primaryText;
-  $("modalOverlay").classList.add("show");
-}
-
-function closeModal(){
-  $("modalOverlay").classList.remove("show");
-}
-
-$("modalClose").addEventListener("click", closeModal);
-$("modalPrimary").addEventListener("click", closeModal);
-$("modalOverlay").addEventListener("click", e => {
-  if(e.target === $("modalOverlay")) closeModal();
-});
-
-loginTab.addEventListener("click", () => {
-  registerMode = false;
-  loginTab.classList.add("active");
-  registerTab.classList.remove("active");
-  usernameInput.hidden = true;
-  usernameInput.required = false;
-  passwordInput.autocomplete = "current-password";
-  showAuthMessage("");
-  authButton.textContent = "Login";
-});
-
-registerTab.addEventListener("click", () => {
-  registerMode = true;
-  registerTab.classList.add("active");
-  loginTab.classList.remove("active");
-  usernameInput.hidden = false;
-  usernameInput.required = true;
-  passwordInput.autocomplete = "new-password";
-  showAuthMessage("");
-  authButton.textContent = "Register";
-});
-
-authForm.addEventListener("submit", async e => {
-  e.preventDefault();
-  showAuthMessage("");
-
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
-  const username = usernameInput.value.trim();
-
-  if(registerMode){
-    if(username.length < 3){
-      showAuthMessage("Username kamida 3 ta belgidan iborat bo‘lsin.");
-      return;
-    }
-    await registerUser(email,password,username);
-  }else{
-    await loginUser(email,password);
-  }
-});
-
-async function registerUser(email,password,username){
-  setLoading(true);
-
-  const {data,error} = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options:{data:{username}}
-  });
-
-  if(error){
-    setLoading(false);
-    showAuthMessage(error.message);
-    return;
-  }
-
-  if(!data.user){
-    setLoading(false);
-    showAuthMessage("Account yaratilmadi.");
-    return;
-  }
-
-  /*
-    Agar Supabase Dashboard'da "Confirm email" ON bo‘lsa,
-    Supabase session bermaydi. Uni OFF qilish kerak.
-  */
-  if(!data.session){
-    setLoading(false);
-    showAuthMessage("Supabase → Authentication → Providers → Email → Confirm email ni OFF qiling.");
-    return;
-  }
-
-  currentUser = data.user;
-  currentProfile = await getProfile(currentUser.id);
-
-  if(!currentProfile){
-    currentProfile = await createProfile(
-      currentUser.id,
-      username
-    );
-  }
-
-  setLoading(false);
-
-  if(!currentProfile){
-    showAuthMessage("Profil yaratilmadi. Profiles jadvalidagi RLS/policylarni tekshiring.");
-    return;
-  }
-
-  await showApp();
-}
-
-async function loginUser(email,password){
-  setLoading(true);
-
-  const {data,error} = await supabaseClient.auth.signInWithPassword({
-    email,password
-  });
-
-  if(error){
-    setLoading(false);
-    showAuthMessage(error.message);
-    return;
-  }
-
-  currentUser = data.user;
-  currentProfile = await getProfile(currentUser.id);
-
-  if(!currentProfile){
-    const username =
-      currentUser.user_metadata?.username ||
-      currentUser.email?.split("@")[0] ||
-      "User";
-    currentProfile = await createProfile(currentUser.id,username);
-  }
-
-  setLoading(false);
-  await showApp();
-}
-
-async function createProfile(userId,username){
-  const {data,error} = await supabaseClient
-    .from("profiles")
-    .insert({
-      id:userId,
-      username,
-      status:"online"
-    })
-    .select()
-    .single();
-
-  if(error){
-    console.error("Profile create error:",error);
-    return null;
-  }
-  return data;
-}
-
-async function getProfile(userId){
-  const {data,error} = await supabaseClient
-    .from("profiles")
-    .select("*")
-    .eq("id",userId)
-    .maybeSingle();
-
-  if(error){
-    console.error("Profile load error:",error);
-    return null;
-  }
-  return data;
-}
-
-async function updateOnlineStatus(status){
-  if(!currentUser) return;
-  await supabaseClient
-    .from("profiles")
-    .update({status})
-    .eq("id",currentUser.id);
-}
-
-async function showApp(){
-  if(!currentUser) return;
-
-  authScreen.style.display = "none";
-  app.hidden = false;
-
-  const username =
-    currentProfile?.username ||
-    currentUser.user_metadata?.username ||
-    currentUser.email?.split("@")[0] ||
-    "User";
-
-  profileName.textContent = username;
-  profileAvatar.textContent = username.charAt(0).toUpperCase();
-
-  await updateOnlineStatus("online");
-  await loadMessages();
-  await loadOnlineMembers();
-  setupRealtime();
-
-  messageInput.focus();
-}
-
-async function logout(){
-  await updateOnlineStatus("offline");
-
-  if(realtimeChannel){
-    await supabaseClient.removeChannel(realtimeChannel);
-    realtimeChannel = null;
-  }
-
-  await supabaseClient.auth.signOut();
-
-  currentUser = null;
-  currentProfile = null;
-  selectedUser = null;
-
-  app.hidden = true;
-  authScreen.style.display = "grid";
-  authForm.reset();
-  loginTab.click();
-  messages.innerHTML = "";
-}
-
-logoutButton.addEventListener("click",logout);
-
-async function loadMessages(){
-  const {data,error} = await supabaseClient
-    .from("messages")
-    .select("*")
-    .order("created_at",{ascending:true});
-
-  if(error){
-    console.error("Messages error:",error);
-    toast("Xabarlarni yuklashda xatolik");
-    return;
-  }
-
-  messages.innerHTML = "";
-  (data || []).forEach(renderMessage);
-  scrollMessages();
-}
-
-function renderMessage(message){
-  const username =
-    currentProfile?.username ||
-    currentUser?.user_metadata?.username ||
-    currentUser?.email?.split("@")[0] ||
-    "User";
-
-  const isMine = message.username === username;
-  const el = document.createElement("div");
-  el.className = "message " + (isMine ? "sent" : "received");
-
-  const name = message.username || "User";
-  const letter = name.charAt(0).toUpperCase();
-  const time = new Date(message.created_at).toLocaleTimeString("uz-UZ",{
-    hour:"2-digit",
-    minute:"2-digit"
-  });
-
-  el.innerHTML = `
-    <div class="avatar">${escapeHTML(letter)}</div>
-    <div>
-      <strong>${escapeHTML(isMine ? "You" : name)}</strong>
-      <p>${escapeHTML(message.content)}</p>
-      <small>${escapeHTML(time)}</small>
+if (!window.supabase) {
+  document.body.innerHTML = `
+    <div style="
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:25px;
+      color:white;
+      background:#07101f;
+      font-family:Arial;
+      text-align:center;
+    ">
+      <div>
+        <h2>Supabase yuklanmadi</h2>
+        <p>Internetni tekshiring va sahifani qayta oching.</p>
+      </div>
     </div>
   `;
-
-  messages.appendChild(el);
+  throw new Error("Supabase library yuklanmadi.");
 }
 
-function scrollMessages(){
-  messages.scrollTop = messages.scrollHeight;
+
+/*
+  ASOSIY FIX:
+  supabaseClient endi aniq shu yerda yaratiladi.
+*/
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const authScreen =
+  document.getElementById("authScreen");
+
+const app =
+  document.getElementById("app");
+
+const authForm =
+  document.getElementById("authForm");
+
+const authButton =
+  document.getElementById("authButton");
+
+const authMessage =
+  document.getElementById("authMessage");
+
+const loginTab =
+  document.getElementById("loginTab");
+
+const registerTab =
+  document.getElementById("registerTab");
+
+const usernameInput =
+  document.getElementById("usernameInput");
+
+const emailInput =
+  document.getElementById("emailInput");
+
+const passwordInput =
+  document.getElementById("passwordInput");
+
+const logoutButton =
+  document.getElementById("logoutButton");
+
+const profileName =
+  document.getElementById("profileName");
+
+const profileAvatar =
+  document.getElementById("profileAvatar");
+
+const searchInput =
+  document.getElementById("searchInput");
+
+const chatList =
+  document.getElementById("chatList");
+
+const chatTitle =
+  document.getElementById("chatTitle");
+
+const chatStatus =
+  document.getElementById("chatStatus");
+
+const headerAvatar =
+  document.getElementById("headerAvatar");
+
+const messages =
+  document.getElementById("messages");
+
+const messageInput =
+  document.getElementById("messageInput");
+
+const sendButton =
+  document.getElementById("sendButton");
+
+const attachButton =
+  document.getElementById("attachButton");
+
+const savedButton =
+  document.getElementById("savedButton");
+
+const savedPanel =
+  document.getElementById("savedPanel");
+
+const savedContent =
+  document.getElementById("savedContent");
+
+const closeSavedButton =
+  document.getElementById("closeSavedButton");
+
+const headerSearchButton =
+  document.getElementById("headerSearchButton");
+
+const callButton =
+  document.getElementById("callButton");
+
+const moreButton =
+  document.getElementById("moreButton");
+
+const toast =
+  document.getElementById("toast");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let registerMode = false;
+
+let currentUser = null;
+
+let currentProfile = null;
+
+let selectedUser = null;
+
+let searchTimer = null;
+
+let realtimeChannel = null;
+
+
+/* =========================================================
+   AUTH MODE
+========================================================= */
+
+loginTab.addEventListener("click", () => {
+
+  registerMode = false;
+
+  loginTab.classList.add("active");
+  registerTab.classList.remove("active");
+
+  usernameInput.hidden = true;
+  usernameInput.required = false;
+
+  passwordInput.autocomplete =
+    "current-password";
+
+  authButton.textContent = "Login";
+
+  clearAuthMessage();
+
+});
+
+
+registerTab.addEventListener("click", () => {
+
+  registerMode = true;
+
+  registerTab.classList.add("active");
+  loginTab.classList.remove("active");
+
+  usernameInput.hidden = false;
+  usernameInput.required = true;
+
+  passwordInput.autocomplete =
+    "new-password";
+
+  authButton.textContent = "Register";
+
+  clearAuthMessage();
+
+});
+
+
+/* =========================================================
+   AUTH FORM
+========================================================= */
+
+authForm.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    clearAuthMessage();
+
+    const email =
+      emailInput.value.trim();
+
+    const password =
+      passwordInput.value;
+
+    const username =
+      usernameInput.value.trim();
+
+
+    if (!email || !password) {
+      showAuthMessage(
+        "Email va password kiriting."
+      );
+      return;
+    }
+
+
+    if (registerMode) {
+
+      if (username.length < 3) {
+
+        showAuthMessage(
+          "Username kamida 3 ta belgidan iborat bo‘lsin."
+        );
+
+        return;
+      }
+
+      await registerUser(
+        email,
+        password,
+        username
+      );
+
+    } else {
+
+      await loginUser(
+        email,
+        password
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   REGISTER
+========================================================= */
+
+async function registerUser(
+  email,
+  password,
+  username
+) {
+
+  setAuthLoading(true);
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.signUp({
+
+        email,
+        password,
+
+        options:{
+          data:{
+            username
+          }
+        }
+
+      });
+
+
+    if (error) {
+
+      showAuthMessage(
+        translateSupabaseError(error.message)
+      );
+
+      return;
+    }
+
+
+    if (!data.user) {
+
+      showAuthMessage(
+        "Account yaratilmadi."
+      );
+
+      return;
+    }
+
+
+    /*
+      Agar Supabase'da email confirmation
+      o‘chirilgan bo‘lsa session darhol keladi.
+    */
+
+    if (data.session) {
+
+      currentUser =
+        data.user;
+
+      currentProfile =
+        await getProfile(
+          currentUser.id
+        );
+
+
+      if (!currentProfile) {
+
+        currentProfile =
+          await createProfile(
+            currentUser.id,
+            username
+          );
+
+      }
+
+
+      await showApp();
+
+      return;
+    }
+
+
+    /*
+      Confirmation hali yoqilgan bo‘lsa.
+    */
+
+    showAuthMessage(
+      "Account yaratildi. Email confirmation talab qilinmoqda. Supabase Authentication sozlamalarida email confirmationni o‘chiring."
+    );
+
+  } catch(error) {
+
+    console.error(error);
+
+    showAuthMessage(
+      "Register vaqtida xatolik yuz berdi."
+    );
+
+  } finally {
+
+    setAuthLoading(false);
+
+  }
+
 }
 
-async function sendMessage(){
-  const content = messageInput.value.trim();
-  if(!content || !currentUser) return;
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function loginUser(
+  email,
+  password
+) {
+
+  setAuthLoading(true);
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth
+        .signInWithPassword({
+
+          email,
+          password
+
+        });
+
+
+    if (error) {
+
+      showAuthMessage(
+        translateSupabaseError(error.message)
+      );
+
+      return;
+    }
+
+
+    if (!data.user) {
+
+      showAuthMessage(
+        "Login amalga oshmadi."
+      );
+
+      return;
+    }
+
+
+    currentUser =
+      data.user;
+
+
+    currentProfile =
+      await getProfile(
+        currentUser.id
+      );
+
+
+    if (!currentProfile) {
+
+      const username =
+        currentUser
+          .user_metadata
+          ?.username
+        ||
+        currentUser.email
+          ?.split("@")[0]
+        ||
+        "User";
+
+
+      currentProfile =
+        await createProfile(
+          currentUser.id,
+          username
+        );
+
+    }
+
+
+    await showApp();
+
+  } catch(error) {
+
+    console.error(error);
+
+    showAuthMessage(
+      "Login vaqtida xatolik."
+    );
+
+  } finally {
+
+    setAuthLoading(false);
+
+  }
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+async function createProfile(
+  userId,
+  username
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .upsert(
+        {
+          id:userId,
+          username:username,
+          status:"online"
+        },
+        {
+          onConflict:"id"
+        }
+      )
+      .select()
+      .single();
+
+
+  if (error) {
+
+    console.error(
+      "Profile create:",
+      error
+    );
+
+    return null;
+  }
+
+
+  return data;
+
+}
+
+
+async function getProfile(
+  userId
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id",userId)
+      .maybeSingle();
+
+
+  if (error) {
+
+    console.error(
+      "Profile get:",
+      error
+    );
+
+    return null;
+  }
+
+
+  return data;
+
+}
+
+
+/* =========================================================
+   SHOW APP
+========================================================= */
+
+async function showApp() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  authScreen.style.display =
+    "none";
+
+  app.hidden = false;
+
 
   const username =
-    currentProfile?.username ||
-    currentUser.user_metadata?.username ||
-    currentUser.email?.split("@")[0] ||
+    currentProfile?.username
+    ||
+    currentUser
+      .user_metadata
+      ?.username
+    ||
+    currentUser.email
+      ?.split("@")[0]
+    ||
     "User";
 
-  sendButton.disabled = true;
 
-  const {error} = await supabaseClient
-    .from("messages")
-    .insert({username,content});
+  profileName.textContent =
+    username;
 
-  sendButton.disabled = false;
 
-  if(error){
-    console.error("Send message error:",error);
-    toast("Xabar yuborilmadi");
-    return;
-  }
+  profileAvatar.textContent =
+    username
+      .charAt(0)
+      .toUpperCase();
 
-  messageInput.value = "";
-  messageInput.focus();
-}
 
-sendButton.addEventListener("click",sendMessage);
-
-messageInput.addEventListener("keydown",e => {
-  if(e.key === "Enter" && !e.shiftKey){
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
-function setupRealtime(){
-  if(realtimeChannel) return;
-
-  realtimeChannel = supabaseClient
-    .channel("dessenjer-messages")
-    .on(
-      "postgres_changes",
-      {
-        event:"INSERT",
-        schema:"public",
-        table:"messages"
-      },
-      payload => {
-        renderMessage(payload.new);
-        scrollMessages();
-      }
-    )
-    .subscribe();
-}
-
-searchInput.addEventListener("input",() => {
-  clearTimeout(searchTimer);
-
-  const query = searchInput.value.trim();
-
-  if(!query){
-    showDefaultChats();
-    return;
-  }
-
-  searchTimer = setTimeout(() => searchUsers(query),300);
-});
-
-async function searchUsers(query){
-  if(!currentUser) return;
-
-  const {data,error} = await supabaseClient
+  await supabaseClient
     .from("profiles")
-    .select("id,username,status")
-    .ilike("username",`%${query}%`)
-    .neq("id",currentUser.id)
-    .limit(15);
+    .update({
+      status:"online"
+    })
+    .eq(
+      "id",
+      currentUser.id
+    );
 
-  if(error){
-    console.error("Search error:",error);
-    toast("User qidirishda xatolik");
-    return;
-  }
 
-  renderSearchResults(data || []);
+  await loadUsers();
+
+  await loadMessages();
+
+  setupRealtime();
+
 }
 
-function renderSearchResults(users){
-  chatList.innerHTML = "";
 
-  if(!users.length){
-    chatList.innerHTML = `<div class="search-empty">User topilmadi</div>`;
-    return;
-  }
+/* =========================================================
+   LOGOUT
+========================================================= */
 
-  users.forEach(user => {
-    const el = document.createElement("div");
-    el.className = "chat";
-    el.innerHTML = `
-      <div class="avatar">${escapeHTML(user.username.charAt(0).toUpperCase())}</div>
-      <div class="chat-info">
-        <strong>${escapeHTML(user.username)}</strong>
-        <span>${user.status === "online" ? "● Online" : "Offline"}</span>
-      </div>
-    `;
+logoutButton.addEventListener(
+  "click",
+  async () => {
 
-    el.addEventListener("click",() => selectUser(user,el));
-    chatList.appendChild(el);
-  });
-}
-
-function selectUser(user,element){
-  document.querySelectorAll(".chat").forEach(x => x.classList.remove("active"));
-  element.classList.add("active");
-
-  selectedUser = user;
-  chatTitle.textContent = user.username;
-  chatStatus.textContent = user.status === "online" ? "● Online" : "● Offline";
-  chatStatus.style.color = user.status === "online" ? "var(--green)" : "var(--muted)";
-
-  toast(user.username + " tanlandi");
-}
-
-function showDefaultChats(){
-  chatList.innerHTML = "";
-
-  const defaults = [
-    {username:"Alex",status:"online",letter:"A"},
-    {username:"Jasur",status:"online",letter:"J"},
-    {username:"Madina",status:"online",letter:"M"}
-  ];
-
-  defaults.forEach((user,index) => {
-    const el = document.createElement("div");
-    el.className = "chat" + (index === 0 ? " active" : "");
-    el.innerHTML = `
-      <div class="avatar">${user.letter}</div>
-      <div class="chat-info">
-        <strong>${user.username}</strong>
-        <span>${user.status === "online" ? "● Online" : "Offline"}</span>
-      </div>
-    `;
-    el.addEventListener("click",() => {
-      document.querySelectorAll(".chat").forEach(x => x.classList.remove("active"));
-      el.classList.add("active");
-      chatTitle.textContent = user.username;
-      chatStatus.textContent = "● Online";
-      chatStatus.style.color = "var(--green)";
-    });
-    chatList.appendChild(el);
-  });
-}
-
-async function loadOnlineMembers(){
-  const {data,error} = await supabaseClient
-    .from("profiles")
-    .select("id,username,status")
-    .eq("status","online")
-    .limit(30);
-
-  if(error){
-    console.error("Members error:",error);
-    return;
-  }
-
-  membersList.innerHTML = "";
-
-  (data || []).forEach(user => {
-    if(currentUser && user.id === currentUser.id) return;
-
-    const el = document.createElement("div");
-    el.className = "member";
-    el.innerHTML = `
-      <div class="avatar">${escapeHTML(user.username.charAt(0).toUpperCase())}</div>
-      <span>${escapeHTML(user.username)}</span>
-      <i></i>
-    `;
-    membersList.appendChild(el);
-  });
-}
-
-$("searchButton").addEventListener("click",() => {
-  searchInput.focus();
-  if(window.innerWidth < 850){
-    searchInput.style.fontSize = "13px";
-    searchInput.style.textIndent = "0";
-  }
-  toast("Search maydoniga user nomini yozing");
-});
-
-$("callButton").addEventListener("click",() => {
-  const name = selectedUser?.username || chatTitle.textContent;
-  openModal("Voice Call",name + " bilan ovozli qo‘ng‘iroq oynasi tayyor. Haqiqiy audio qo‘ng‘iroq uchun WebRTC/signaling backend kerak bo‘ladi.","Tushundim");
-});
-
-$("moreButton").addEventListener("click",() => {
-  openModal("Chat menu","Bu yerga keyingi bosqichda Pin, Mute, Clear chat va boshqa amallar qo‘shiladi.","Yopish");
-});
-
-$("attachButton").addEventListener("click",() => {
-  openModal("Attachments","Fayl, rasm va video yuborish funksiyasini keyingi bosqichda Supabase Storage bilan ulash mumkin.","Yopish");
-});
-
-document.addEventListener("visibilitychange",async() => {
-  if(!currentUser) return;
-  await updateOnlineStatus(document.hidden ? "offline" : "online");
-});
-
-window.addEventListener("beforeunload",() => {
-  if(currentUser){
-    supabaseClient.from("profiles").update({status:"offline"}).eq("id",currentUser.id);
-  }
-});
-
-supabaseClient.auth.onAuthStateChange(async(event,session) => {
-  if(session?.user && !currentUser){
-    currentUser = session.user;
-    currentProfile = await getProfile(currentUser.id);
-
-    if(!currentProfile){
-      const username =
-        currentUser.user_metadata?.username ||
-        currentUser.email?.split("@")[0] ||
-        "User";
-      currentProfile = await createProfile(currentUser.id,username);
+    if (!currentUser) {
+      return;
     }
 
-    await showApp();
-  }
 
-  if(event === "SIGNED_OUT"){
+    await supabaseClient
+      .from("profiles")
+      .update({
+        status:"offline"
+      })
+      .eq(
+        "id",
+        currentUser.id
+      );
+
+
+    if (realtimeChannel) {
+
+      await supabaseClient
+        .removeChannel(
+          realtimeChannel
+        );
+
+      realtimeChannel = null;
+
+    }
+
+
+    await supabaseClient.auth.signOut();
+
+
     currentUser = null;
     currentProfile = null;
+    selectedUser = null;
+
+
+    app.hidden = true;
+
+    authScreen.style.display =
+      "flex";
+
+    authForm.reset();
+
+    loginTab.click();
+
+    chatList.innerHTML = "";
+
+    messages.innerHTML = "";
+
   }
-});
+);
 
-async function startApp(){
-  const {data,error} = await supabaseClient.auth.getSession();
 
-  if(error){
-    console.error(error);
+/* =========================================================
+   USERS
+========================================================= */
+
+async function loadUsers() {
+
+  if (!currentUser) {
     return;
   }
 
-  if(data.session?.user){
-    currentUser = data.session.user;
-    currentProfile = await getProfile(currentUser.id);
 
-    if(!currentProfile){
-      const username =
-        currentUser.user_metadata?.username ||
-        currentUser.email?.split("@")[0] ||
-        "User";
-      currentProfile = await createProfile(currentUser.id,username);
-    }
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id,username,status"
+      )
+      .neq(
+        "id",
+        currentUser.id
+      )
+      .order(
+        "username",
+        {
+          ascending:true
+        }
+      )
+      .limit(100);
 
-    await showApp();
-  }else{
-    app.hidden = true;
-    authScreen.style.display = "grid";
-    showDefaultChats();
+
+  if (error) {
+
+    console.error(
+      "Users:",
+      error
+    );
+
+    return;
   }
+
+
+  renderUsers(data || []);
+
 }
 
-showDefaultChats();
+
+function renderUsers(users) {
+
+  chatList.innerHTML = "";
+
+
+  if (!users.length) {
+
+    chatList.innerHTML = `
+      <div class="no-results">
+        Hozircha boshqa userlar yo‘q.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  users.forEach(user => {
+
+    const item =
+      createUserElement(user);
+
+    chatList.appendChild(item);
+
+  });
+
+}
+
+
+function createUserElement(user) {
+
+  const item =
+    document.createElement("div");
+
+  item.className =
+    "chat-item";
+
+  if (
+    selectedUser &&
+    selectedUser.id === user.id
+  ) {
+
+    item.classList.add("active");
+
+  }
+
+
+  const avatar =
+    document.createElement("div");
+
+  avatar.className =
+    "avatar";
+
+  if (user.status === "online") {
+    avatar.classList.add("online");
+  }
+
+
+  avatar.textContent =
+    (user.username || "U")
+      .charAt(0)
+      .toUpperCase();
+
+
+  const text =
+    document.createElement("div");
+
+  text.className =
+    "chat-text";
+
+
+  const name =
+    document.createElement("span");
+
+  name.className =
+    "chat-name";
+
+  name.textContent =
+    user.username || "User";
+
+
+  const preview =
+    document.createElement("span");
+
+  preview.className =
+    "chat-preview";
+
+  preview.textContent =
+    user.status === "online"
+      ? "Online"
+      : "Offline";
+
+
+  text.appendChild(name);
+  text.appendChild(preview);
+
+
+  item.appendChild(avatar);
+  item.appendChild(text);
+
+
+  item.addEventListener(
+    "click",
+    () => selectUser(user)
+  );
+
+
+  return item;
+
+}
+
+
+/* =========================================================
+   SELECT USER
+========================================================= */
+
+async function selectUser(user) {
+
+  selectedUser =
+    user;
+
+
+  chatTitle.textContent =
+    user.username;
+
+
+  chatStatus.textContent =
+    user.status === "online"
+      ? "● Online"
+      : "● Offline";
+
+
+  chatStatus.style.color =
+    user.status === "online"
+      ? "var(--green)"
+      : "var(--muted)";
+
+
+  headerAvatar.style.display =
+    "flex";
+
+
+  headerAvatar.textContent =
+    (user.username || "U")
+      .charAt(0)
+      .toUpperCase();
+
+
+  document
+    .querySelectorAll(".chat-item")
+    .forEach(item =>
+      item.classList.remove("active")
+    );
+
+
+  /*
+    Qidiruv natijasidagi elementni
+    active qilish.
+  */
+
+  const items =
+    [...document.querySelectorAll(".chat-item")];
+
+  const matching =
+    items.find(item =>
+      item.querySelector(".chat-name")
+        ?.textContent
+        === user.username
+    );
+
+  matching?.classList.add("active");
+
+
+  /*
+    Hozirgi schema bilan moslik uchun
+    barcha messages yuklanadi.
+  */
+
+  await loadMessages();
+
+  messageInput.focus();
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+searchInput.addEventListener(
+  "input",
+  () => {
+
+    clearTimeout(searchTimer);
+
+    const query =
+      searchInput.value.trim();
+
+
+    if (!query) {
+
+      loadUsers();
+
+      return;
+
+    }
+
+
+    searchTimer =
+      setTimeout(
+        () => searchUsers(query),
+        250
+      );
+
+  }
+);
+
+
+async function searchUsers(query) {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id,username,status"
+      )
+      .ilike(
+        "username",
+        `%${query}%`
+      )
+      .neq(
+        "id",
+        currentUser.id
+      )
+      .order(
+        "username",
+        {
+          ascending:true
+        }
+      )
+      .limit(30);
+
+
+  if (error) {
+
+    console.error(
+      "Search:",
+      error
+    );
+
+    return;
+  }
+
+
+  renderUsers(
+    data || []
+  );
+
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+async function loadMessages() {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:true
+        }
+      )
+      .limit(500);
+
+
+  if (error) {
+
+    console.error(
+      "Messages:",
+      error
+    );
+
+    messages.innerHTML = `
+      <div class="empty-messages">
+        <div>
+          <strong>Xabarlarni yuklab bo‘lmadi.</strong>
+          <div style="margin-top:7px;font-size:12px">
+            Supabase messages jadvali va RLS sozlamalarini tekshiring.
+          </div>
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  renderMessages(
+    data || []
+  );
+
+}
+
+
+function renderMessages(data) {
+
+  messages.innerHTML = "";
+
+
+  if (!data.length) {
+
+    messages.innerHTML = `
+      <div class="empty-messages">
+        <div>
+          <div style="font-size:42px;font-weight:800;margin-bottom:12px">
+            D
+          </div>
+          <div>Hali xabar yo‘q</div>
+          <div style="margin-top:6px;font-size:12px">
+            Birinchi xabarni yuboring.
+          </div>
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  data.forEach(
+    message =>
+      renderMessage(
+        message,
+        false
+      )
+  );
+
+
+  scrollMessages();
+
+}
+
+
+function renderMessage(
+  message,
+  scroll = true
+) {
+
+  /*
+    Realtime duplicate himoyasi.
+  */
+
+  if (
+    message.id &&
+    messages.querySelector(
+      `[data-message-id="${CSS.escape(String(message.id))}"]`
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "message-row";
+
+
+  const username =
+    message.username || "User";
+
+
+  /*
+    username orqali current userni
+    aniqlaymiz.
+  */
+
+  const myUsername =
+    currentProfile?.username
+    ||
+    currentUser
+      ?.user_metadata
+      ?.username
+    ||
+    "";
+
+
+  const isMine =
+    username === myUsername;
+
+
+  if (isMine) {
+    row.classList.add("mine");
+  }
+
+
+  if (message.id) {
+
+    row.dataset.messageId =
+      String(message.id);
+
+  }
+
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.className =
+    "message";
+
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className =
+    "message-bubble";
+
+
+  const author =
+    document.createElement("div");
+
+  author.className =
+    "message-author";
+
+  author.textContent =
+    isMine
+      ? "You"
+      : username;
+
+
+  const content =
+    document.createElement("p");
+
+  content.className =
+    "message-content";
+
+  content.textContent =
+    message.content || "";
+
+
+  const meta =
+    document.createElement("div");
+
+  meta.className =
+    "message-meta";
+
+
+  const time =
+    formatTime(
+      message.created_at
+    );
+
+
+  meta.textContent =
+    time;
+
+
+  bubble.appendChild(author);
+  bubble.appendChild(content);
+  bubble.appendChild(meta);
+
+  wrapper.appendChild(bubble);
+
+  row.appendChild(wrapper);
+
+  /*
+    Xabarni bosib ushlab / o‘ng bosib
+    kerakli xabarlarga saqlash imkoniyati.
+  */
+
+  row.addEventListener(
+    "contextmenu",
+    event => {
+
+      event.preventDefault();
+
+      openMessageActions(
+        row,
+        message
+      );
+
+    }
+  );
+
+
+  /*
+    Mobile long press.
+  */
+
+  let pressTimer = null;
+
+  row.addEventListener(
+    "touchstart",
+    () => {
+
+      pressTimer =
+        setTimeout(
+          () => openMessageActions(
+            row,
+            message
+          ),
+          650
+        );
+
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  row.addEventListener(
+    "touchend",
+    () => {
+      clearTimeout(pressTimer);
+    }
+  );
+
+
+  row.addEventListener(
+    "touchmove",
+    () => {
+      clearTimeout(pressTimer);
+    }
+  );
+
+
+  messages.appendChild(row);
+
+
+  if (scroll) {
+    scrollMessages();
+  }
+
+}
+
+
+/* =========================================================
+   MESSAGE ACTIONS
+========================================================= */
+
+function openMessageActions(
+  row,
+  message
+) {
+
+  document
+    .querySelectorAll(".message-actions")
+    .forEach(el => el.remove());
+
+
+  const menu =
+    document.createElement("div");
+
+  menu.className =
+    "message-actions";
+
+
+  const save =
+    document.createElement("button");
+
+  save.textContent =
+    "☆ Kerakli xabarlarga";
+
+
+  save.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      saveMessage(message);
+
+      menu.remove();
+
+    }
+  );
+
+
+  menu.appendChild(save);
+
+  row.style.position =
+    "relative";
+
+  row.appendChild(menu);
+
+
+  setTimeout(() => {
+
+    document.addEventListener(
+      "click",
+      function close(e) {
+
+        if (!menu.contains(e.target)) {
+
+          menu.remove();
+
+          document.removeEventListener(
+            "click",
+            close
+          );
+
+        }
+
+      }
+    );
+
+  },0);
+
+}
+
+
+/* =========================================================
+   SAVED MESSAGES
+========================================================= */
+
+function getSavedMessages() {
+
+  try {
+
+    return JSON.parse(
+      localStorage.getItem(
+        "dessenjer_saved_messages"
+      ) || "[]"
+    );
+
+  } catch {
+
+    return [];
+
+  }
+
+}
+
+
+function saveMessage(message) {
+
+  const saved =
+    getSavedMessages();
+
+
+  const exists =
+    saved.some(
+      item =>
+        String(item.id) ===
+        String(message.id)
+    );
+
+
+  if (exists) {
+
+    showToast(
+      "Bu xabar allaqachon saqlangan."
+    );
+
+    return;
+
+  }
+
+
+  saved.unshift({
+    id:
+      message.id ||
+      `${Date.now()}-${Math.random()}`,
+
+    username:
+      message.username || "User",
+
+    content:
+      message.content || "",
+
+    created_at:
+      message.created_at ||
+      new Date().toISOString()
+  });
+
+
+  localStorage.setItem(
+    "dessenjer_saved_messages",
+    JSON.stringify(
+      saved.slice(0,500)
+    )
+  );
+
+
+  showToast(
+    "Xabar Kerakli xabarlarga saqlandi."
+  );
+
+}
+
+
+function renderSavedMessages() {
+
+  const saved =
+    getSavedMessages();
+
+
+  savedContent.innerHTML = "";
+
+
+  if (!saved.length) {
+
+    savedContent.innerHTML = `
+      <div class="saved-empty">
+        <div>
+          <div style="
+            width:58px;
+            height:58px;
+            margin:0 auto 15px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:50%;
+            background:#123052;
+            font-size:25px;
+          ">★</div>
+
+          <strong>Kerakli xabarlar</strong>
+
+          <div style="
+            margin-top:7px;
+            font-size:12px;
+          ">
+            Kerakli xabarni bosib ushlab,
+            shu yerga saqlashingiz mumkin.
+          </div>
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  saved.forEach(item => {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "saved-message";
+
+
+    const text =
+      document.createElement("p");
+
+    text.className =
+      "saved-message-text";
+
+    text.textContent =
+      item.content;
+
+
+    const time =
+      document.createElement("div");
+
+    time.className =
+      "saved-message-time";
+
+    time.textContent =
+      `${item.username} • ${formatTime(item.created_at)}`;
+
+
+    const remove =
+      document.createElement("button");
+
+    remove.textContent =
+      "O‘chirish";
+
+    remove.style.cssText = `
+      float:right;
+      margin-top:-23px;
+      border:0;
+      background:transparent;
+      color:#ff7180;
+      font-size:11px;
+      cursor:pointer;
+    `;
+
+
+    remove.addEventListener(
+      "click",
+      () => {
+
+        const updated =
+          getSavedMessages()
+            .filter(
+              x =>
+                String(x.id) !==
+                String(item.id)
+            );
+
+
+        localStorage.setItem(
+          "dessenjer_saved_messages",
+          JSON.stringify(updated)
+        );
+
+
+        renderSavedMessages();
+
+      }
+    );
+
+
+    card.appendChild(text);
+    card.appendChild(time);
+    card.appendChild(remove);
+
+    savedContent.appendChild(card);
+
+  });
+
+}
+
+
+savedButton.addEventListener(
+  "click",
+  () => {
+
+    renderSavedMessages();
+
+    savedPanel.classList.add(
+      "open"
+    );
+
+  }
+);
+
+
+closeSavedButton.addEventListener(
+  "click",
+  () => {
+
+    savedPanel.classList.remove(
+      "open"
+    );
+
+  }
+);
+
+
+savedPanel.addEventListener(
+  "click",
+  event => {
+
+    if (
+      event.target === savedPanel
+    ) {
+
+      savedPanel.classList.remove(
+        "open"
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   SEND MESSAGE
+========================================================= */
+
+messageInput.addEventListener(
+  "input",
+  () => {
+
+    sendButton.disabled =
+      !messageInput.value.trim();
+
+  }
+);
+
+
+async function sendMessage() {
+
+  const content =
+    messageInput.value.trim();
+
+
+  if (!content) {
+    return;
+  }
+
+
+  if (!currentUser) {
+
+    showToast(
+      "Avval login qiling."
+    );
+
+    return;
+  }
+
+
+  const username =
+    currentProfile?.username
+    ||
+    currentUser
+      .user_metadata
+      ?.username
+    ||
+    "User";
+
+
+  sendButton.disabled =
+    true;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("messages")
+      .insert({
+        username,
+        content
+      })
+      .select()
+      .single();
+
+
+  if (error) {
+
+    console.error(
+      "Send:",
+      error
+    );
+
+    showToast(
+      "Xabar yuborilmadi."
+    );
+
+    sendButton.disabled =
+      false;
+
+    return;
+  }
+
+
+  /*
+    Realtime ishlasa xabar o‘zi keladi.
+    Realtime kechiksa ham user xabarni ko‘radi.
+  */
+
+  if (data) {
+
+    renderMessage(
+      data,
+      true
+    );
+
+  }
+
+
+  messageInput.value = "";
+
+  sendButton.disabled =
+    true;
+
+  messageInput.focus();
+
+}
+
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+messageInput.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+
+      event.preventDefault();
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   REALTIME
+========================================================= */
+
+function setupRealtime() {
+
+  if (realtimeChannel) {
+
+    supabaseClient.removeChannel(
+      realtimeChannel
+    );
+
+  }
+
+
+  realtimeChannel =
+    supabaseClient
+      .channel(
+        "dessenjer-messages-realtime"
+      )
+      .on(
+        "postgres_changes",
+        {
+          event:"INSERT",
+          schema:"public",
+          table:"messages"
+        },
+        payload => {
+
+          renderMessage(
+            payload.new,
+            true
+          );
+
+        }
+      )
+      .subscribe(
+        status => {
+
+          console.log(
+            "Realtime:",
+            status
+          );
+
+        }
+      );
+
+}
+
+
+/* =========================================================
+   HEADER BUTTONS
+========================================================= */
+
+headerSearchButton.addEventListener(
+  "click",
+  () => {
+
+    searchInput.focus();
+
+    if (
+      window.innerWidth <= 760
+    ) {
+
+      showToast(
+        "Qidiruv yuqoridagi Search maydonida."
+      );
+
+    }
+
+  }
+);
+
+
+callButton.addEventListener(
+  "click",
+  () => {
+
+    showToast(
+      "Audio call keyingi bosqichda ulanadi."
+    );
+
+  }
+);
+
+
+moreButton.addEventListener(
+  "click",
+  () => {
+
+    showToast(
+      "Chat sozlamalari keyingi bosqichda."
+    );
+
+  }
+);
+
+
+attachButton.addEventListener(
+  "click",
+  () => {
+
+    showToast(
+      "Fayl yuborish keyingi bosqichda qo‘shiladi."
+    );
+
+  }
+);
+
+
+/* =========================================================
+   DEFAULT SELECT / SEARCH
+========================================================= */
+
+function formatTime(date) {
+
+  if (!date) {
+    return "";
+  }
+
+
+  const d =
+    new Date(date);
+
+
+  if (Number.isNaN(d.getTime())) {
+    return "";
+  }
+
+
+  return d.toLocaleTimeString(
+    "uz-UZ",
+    {
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+
+function scrollMessages() {
+
+  requestAnimationFrame(
+    () => {
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   AUTH HELPERS
+========================================================= */
+
+function showAuthMessage(
+  message
+) {
+
+  authMessage.textContent =
+    message;
+
+}
+
+
+function clearAuthMessage() {
+
+  authMessage.textContent =
+    "";
+
+}
+
+
+function setAuthLoading(
+  loading
+) {
+
+  authButton.disabled =
+    loading;
+
+
+  if (loading) {
+
+    authButton.textContent =
+      "Loading...";
+
+  } else {
+
+    authButton.textContent =
+      registerMode
+        ? "Register"
+        : "Login";
+
+  }
+
+}
+
+
+function translateSupabaseError(
+  message
+) {
+
+  const text =
+    String(message || "");
+
+
+  if (
+    text.toLowerCase()
+      .includes("invalid login credentials")
+  ) {
+
+    return "Email yoki password noto‘g‘ri.";
+
+  }
+
+
+  if (
+    text.toLowerCase()
+      .includes("email not confirmed")
+  ) {
+
+    return "Email tasdiqlanmagan. Supabase'da email confirmationni o‘chiring.";
+
+  }
+
+
+  if (
+    text.toLowerCase()
+      .includes("user already registered")
+  ) {
+
+    return "Bu email bilan account allaqachon mavjud.";
+
+  }
+
+
+  if (
+    text.toLowerCase()
+      .includes("password should be at least")
+  ) {
+
+    return "Password kamida 6 ta belgidan iborat bo‘lsin.";
+
+  }
+
+
+  if (
+    text.toLowerCase()
+      .includes("invalid api key")
+  ) {
+
+    return "Supabase API key noto‘g‘ri. Dashboard'dagi Publishable/anon keyni tekshiring.";
+
+  }
+
+
+  return text;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer = null;
+
+
+function showToast(
+  text
+) {
+
+  toast.textContent =
+    text;
+
+  toast.classList.add(
+    "show"
+  );
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+  toastTimer =
+    setTimeout(
+      () => {
+
+        toast.classList.remove(
+          "show"
+        );
+
+      },
+      2500
+    );
+
+}
+
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  async (
+    event,
+    session
+  ) => {
+
+    console.log(
+      "Auth:",
+      event
+    );
+
+
+    if (
+      session?.user &&
+      !currentUser
+    ) {
+
+      currentUser =
+        session.user;
+
+
+      currentProfile =
+        await getProfile(
+          currentUser.id
+        );
+
+
+      if (!currentProfile) {
+
+        const username =
+          currentUser
+            .user_metadata
+            ?.username
+          ||
+          currentUser.email
+            ?.split("@")[0]
+          ||
+          "User";
+
+
+        currentProfile =
+          await createProfile(
+            currentUser.id,
+            username
+          );
+
+      }
+
+
+      await showApp();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START APP
+========================================================= */
+
+async function startApp() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+
+    if (error) {
+
+      console.error(
+        "Session:",
+        error
+      );
+
+      return;
+
+    }
+
+
+    if (data.session) {
+
+      currentUser =
+        data.session.user;
+
+
+      currentProfile =
+        await getProfile(
+          currentUser.id
+        );
+
+
+      if (!currentProfile) {
+
+        const username =
+          currentUser
+            .user_metadata
+            ?.username
+          ||
+          currentUser.email
+            ?.split("@")[0]
+          ||
+          "User";
+
+
+        currentProfile =
+          await createProfile(
+            currentUser.id,
+            username
+          );
+
+      }
+
+
+      await showApp();
+
+    } else {
+
+      app.hidden = true;
+
+      authScreen.style.display =
+        "flex";
+
+    }
+
+  } catch(error) {
+
+    console.error(
+      "START:",
+      error
+    );
+
+  }
+
+}
+
+
 startApp();
+
 </script>
+
 </body>
-      </html>
+  </html>
