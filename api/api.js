@@ -1,3 +1,7 @@
+// ========================================
+// DESSENJER - SUPABASE CONNECTION
+// ========================================
+
 const SUPABASE_URL =
   "https://itdbusdpkgcxyxzbfrjn.supabase.co";
 
@@ -10,8 +14,3 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
-
-
-console.log(
-  "DESSENJER: Supabase connected!"
-);
