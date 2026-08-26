@@ -32,6 +32,36 @@ const chatTitle = document.getElementById("chatTitle");
 let registerMode = false;
 let currentUser = null;
 let currentProfile = null;
+let authBusy = false;
+
+
+// ========================================
+// SAFE TIMEOUT
+// ========================================
+
+function withTimeout(promise, milliseconds = 15000) {
+
+  return Promise.race([
+
+    promise,
+
+    new Promise((_, reject) => {
+
+      setTimeout(() => {
+
+        reject(
+          new Error(
+            "Supabase javobi juda uzoq vaqt keldi."
+          )
+        );
+
+      }, milliseconds);
+
+    })
+
+  ]);
+
+}
 
 
 // ========================================
@@ -84,6 +114,10 @@ authForm.addEventListener("submit", async (event) => {
 
   event.preventDefault();
 
+  if (authBusy) {
+    return;
+  }
+
   clearAuthMessage();
 
   const email = emailInput.value.trim();
@@ -91,19 +125,47 @@ authForm.addEventListener("submit", async (event) => {
   const username = usernameInput.value.trim();
 
 
+  if (!email) {
+
+    showAuthMessage(
+      "Email kiriting."
+    );
+
+    return;
+  }
+
+
+  if (!password) {
+
+    showAuthMessage(
+      "Parol kiriting."
+    );
+
+    return;
+  }
+
+
   if (registerMode) {
 
     if (!username) {
-      showAuthMessage("Username kiriting.");
+
+      showAuthMessage(
+        "Username kiriting."
+      );
+
       return;
     }
 
+
     if (username.length < 3) {
+
       showAuthMessage(
         "Username kamida 3 ta belgidan iborat bo‘lsin."
       );
+
       return;
     }
+
 
     await registerUser(
       email,
@@ -135,81 +197,150 @@ async function registerUser(
 
   setAuthLoading(true);
 
-  const {
-    data,
-    error
-  } = await supabaseClient.auth.signUp({
+  showAuthMessage(
+    "Account yaratilmoqda..."
+  );
 
-    email,
-    password,
 
-    options: {
-      data: {
-        username
-      }
+  try {
+
+    console.log(
+      "DESSENJER: Register boshlandi"
+    );
+
+
+    const result =
+      await withTimeout(
+
+        supabaseClient.auth.signUp({
+
+          email: email,
+
+          password: password,
+
+          options: {
+
+            data: {
+              username: username
+            }
+
+          }
+
+        }),
+
+        15000
+
+      );
+
+
+    const data = result.data;
+    const error = result.error;
+
+
+    console.log(
+      "DESSENJER: Supabase Auth javob berdi",
+      data,
+      error
+    );
+
+
+    if (error) {
+
+      showAuthMessage(
+        "Register xatosi: " +
+        error.message
+      );
+
+      setAuthLoading(false);
+
+      return;
     }
 
-  });
+
+    if (!data || !data.user) {
+
+      showAuthMessage(
+        "Supabase user yaratmadi."
+      );
+
+      setAuthLoading(false);
+
+      return;
+    }
 
 
-  if (error) {
-
-    setAuthLoading(false);
-
-    showAuthMessage(error.message);
-
-    return;
-  }
+    currentUser =
+      data.user;
 
 
-  if (!data.user) {
+    /*
+     * Email confirmation yoqilgan bo‘lsa,
+     * session null bo‘lishi mumkin.
+     */
+
+    if (!data.session) {
+
+      setAuthLoading(false);
+
+      showAuthMessage(
+        "Account yaratildi! Emailingizni tasdiqlang, keyin Login qiling."
+      );
+
+      return;
+    }
+
+
+    showAuthMessage(
+      "Profil yaratilmoqda..."
+    );
+
+
+    currentProfile =
+      await createProfile(
+        currentUser.id,
+        username
+      );
+
+
+    if (!currentProfile) {
+
+      setAuthLoading(false);
+
+      showAuthMessage(
+        "Account yaratildi, lekin profil yaratilmadi. Supabase RLS sozlamalarini tekshirish kerak."
+      );
+
+      return;
+    }
+
 
     setAuthLoading(false);
 
     showAuthMessage(
-      "Account yaratishda xatolik."
+      "Muvaffaqiyatli! DESSENJER ochilmoqda..."
     );
 
-    return;
-  }
+
+    await showApp();
 
 
-  if (!data.session) {
+  } catch (error) {
+
+    console.error(
+      "REGISTER ERROR:",
+      error
+    );
+
 
     setAuthLoading(false);
 
-    showAuthMessage(
-      "Account yaratildi. Emailingizni tasdiqlang, keyin Login qiling."
-    );
-
-    return;
-  }
-
-
-  currentUser = data.user;
-
-  currentProfile =
-    await createProfile(
-      currentUser.id,
-      username
-    );
-
-
-  if (!currentProfile) {
-
-    setAuthLoading(false);
 
     showAuthMessage(
-      "Profil yaratishda xatolik."
+      "Xatolik: " +
+      error.message
     );
 
-    return;
   }
-
-
-  setAuthLoading(false);
-
-  showApp();
 
 }
 
@@ -225,62 +356,119 @@ async function loginUser(
 
   setAuthLoading(true);
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.auth
-      .signInWithPassword({
-
-        email,
-        password
-
-      });
+  showAuthMessage(
+    "Login qilinmoqda..."
+  );
 
 
-  if (error) {
+  try {
 
-    setAuthLoading(false);
+    const result =
+      await withTimeout(
 
-    showAuthMessage(error.message);
+        supabaseClient
+          .auth
+          .signInWithPassword({
 
-    return;
-  }
+            email: email,
+
+            password: password
+
+          }),
+
+        15000
+
+      );
 
 
-  currentUser = data.user;
+    const data = result.data;
+    const error = result.error;
 
-  currentProfile =
-    await getProfile(
-      currentUser.id
+
+    if (error) {
+
+      setAuthLoading(false);
+
+      showAuthMessage(
+        "Login xatosi: " +
+        error.message
+      );
+
+      return;
+    }
+
+
+    if (!data || !data.user) {
+
+      setAuthLoading(false);
+
+      showAuthMessage(
+        "User topilmadi."
+      );
+
+      return;
+    }
+
+
+    currentUser =
+      data.user;
+
+
+    showAuthMessage(
+      "Profil yuklanmoqda..."
     );
 
 
-  if (!currentProfile) {
-
-    const username =
-      currentUser
-        .user_metadata
-        ?.username
-      ||
-      currentUser.email
-        ?.split("@")[0]
-      ||
-      "User";
-
-
     currentProfile =
-      await createProfile(
-        currentUser.id,
-        username
+      await getProfile(
+        currentUser.id
       );
 
+
+    if (!currentProfile) {
+
+      const username =
+        currentUser
+          .user_metadata
+          ?.username
+        ||
+        currentUser.email
+          ?.split("@")[0]
+        ||
+        "User";
+
+
+      currentProfile =
+        await createProfile(
+          currentUser.id,
+          username
+        );
+
+    }
+
+
+    setAuthLoading(false);
+
+    await showApp();
+
+
+  } catch (error) {
+
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
+
+
+    setAuthLoading(false);
+
+
+    showAuthMessage(
+      "Xatolik: " +
+      error.message
+    );
+
   }
-
-
-  setAuthLoading(false);
-
-  showApp();
 
 }
 
@@ -294,35 +482,84 @@ async function createProfile(
   username
 ) {
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("profiles")
-      .insert({
+  try {
 
-        id: userId,
-        username,
-        status: "online"
-
-      })
-      .select()
-      .single();
+    console.log(
+      "DESSENJER: Profile yaratish boshlandi"
+    );
 
 
-  if (error) {
+    const result =
+      await withTimeout(
 
-    console.error(
-      "Profile create error:",
+        supabaseClient
+          .from("profiles")
+          .insert({
+
+            id: userId,
+
+            username: username,
+
+            status: "online"
+
+          })
+          .select()
+          .single(),
+
+        10000
+
+      );
+
+
+    const data = result.data;
+    const error = result.error;
+
+
+    console.log(
+      "DESSENJER: Profile javobi",
+      data,
       error
     );
 
+
+    if (error) {
+
+      console.error(
+        "PROFILE CREATE ERROR:",
+        error
+      );
+
+
+      showAuthMessage(
+        "Profile xatosi: " +
+        error.message
+      );
+
+
+      return null;
+    }
+
+
+    return data;
+
+
+  } catch (error) {
+
+    console.error(
+      "PROFILE CREATE TIMEOUT/ERROR:",
+      error
+    );
+
+
+    showAuthMessage(
+      "Profile xatosi: " +
+      error.message
+    );
+
+
     return null;
+
   }
-
-
-  return data;
 
 }
 
@@ -335,29 +572,50 @@ async function getProfile(
   userId
 ) {
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
+  try {
+
+    const result =
+      await withTimeout(
+
+        supabaseClient
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .maybeSingle(),
+
+        10000
+
+      );
 
 
-  if (error) {
+    const data = result.data;
+    const error = result.error;
+
+
+    if (error) {
+
+      console.error(
+        "PROFILE LOAD ERROR:",
+        error
+      );
+
+      return null;
+    }
+
+
+    return data;
+
+
+  } catch (error) {
 
     console.error(
-      "Profile load error:",
+      "PROFILE LOAD TIMEOUT:",
       error
     );
 
     return null;
+
   }
-
-
-  return data;
 
 }
 
@@ -373,7 +631,8 @@ async function showApp() {
   }
 
 
-  authScreen.style.display = "none";
+  authScreen.style.display =
+    "none";
 
   app.hidden = false;
 
@@ -391,7 +650,9 @@ async function showApp() {
     "User";
 
 
-  profileName.textContent = username;
+  profileName.textContent =
+    username;
+
 
   profileAvatar.textContent =
     username
@@ -399,18 +660,36 @@ async function showApp() {
       .toUpperCase();
 
 
-  await supabaseClient
-    .from("profiles")
-    .update({
-      status: "online"
-    })
-    .eq(
-      "id",
-      currentUser.id
+  try {
+
+    await withTimeout(
+
+      supabaseClient
+        .from("profiles")
+        .update({
+          status: "online"
+        })
+        .eq(
+          "id",
+          currentUser.id
+        ),
+
+      8000
+
     );
+
+  } catch (error) {
+
+    console.warn(
+      "Online status error:",
+      error
+    );
+
+  }
 
 
   await loadMessages();
+
 
   messageInput.focus();
 
@@ -425,31 +704,48 @@ logoutButton.addEventListener(
   "click",
   async () => {
 
-    if (currentUser) {
+    try {
+
+      if (currentUser) {
+
+        await supabaseClient
+          .from("profiles")
+          .update({
+            status: "offline"
+          })
+          .eq(
+            "id",
+            currentUser.id
+          );
+
+      }
+
 
       await supabaseClient
-        .from("profiles")
-        .update({
-          status: "offline"
-        })
-        .eq(
-          "id",
-          currentUser.id
-        );
+        .auth
+        .signOut();
+
+
+    } catch (error) {
+
+      console.error(
+        "Logout error:",
+        error
+      );
 
     }
 
 
-    await supabaseClient.auth.signOut();
-
-
     currentUser = null;
+
     currentProfile = null;
 
 
     app.hidden = true;
 
-    authScreen.style.display = "flex";
+    authScreen.style.display =
+      "flex";
+
 
     authForm.reset();
 
@@ -465,39 +761,60 @@ logoutButton.addEventListener(
 
 async function loadMessages() {
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("messages")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: true
-        }
+  try {
+
+    const result =
+      await withTimeout(
+
+        supabaseClient
+          .from("messages")
+          .select("*")
+          .order(
+            "created_at",
+            {
+              ascending: true
+            }
+          ),
+
+        10000
+
       );
 
 
-  if (error) {
+    const data = result.data;
+    const error = result.error;
+
+
+    if (error) {
+
+      console.error(
+        "Messages error:",
+        error
+      );
+
+      return;
+    }
+
+
+    messagesContainer.innerHTML = "";
+
+
+    data.forEach(
+      renderMessage
+    );
+
+
+    scrollMessages();
+
+
+  } catch (error) {
 
     console.error(
-      "Messages error:",
+      "Messages timeout:",
       error
     );
 
-    return;
   }
-
-
-  messagesContainer.innerHTML = "";
-
-  data.forEach(
-    renderMessage
-  );
-
-  scrollMessages();
 
 }
 
@@ -506,7 +823,14 @@ async function loadMessages() {
 // RENDER MESSAGE
 // ========================================
 
-function renderMessage(message) {
+function renderMessage(
+  message
+) {
+
+  if (!message) {
+    return;
+  }
+
 
   const element =
     document.createElement("div");
@@ -521,7 +845,8 @@ function renderMessage(message) {
 
 
   const isMine =
-    message.username === myUsername;
+    message.username ===
+    myUsername;
 
 
   element.className =
@@ -550,7 +875,9 @@ function renderMessage(message) {
         <strong>You</strong>
 
         <p>
-          ${escapeHTML(message.content)}
+          ${escapeHTML(
+            message.content
+          )}
         </p>
 
         <small>
@@ -570,17 +897,23 @@ function renderMessage(message) {
 
     element.innerHTML = `
       <div class="avatar">
-        ${escapeHTML(firstLetter)}
+        ${escapeHTML(
+          firstLetter
+        )}
       </div>
 
       <div>
 
         <strong>
-          ${escapeHTML(message.username)}
+          ${escapeHTML(
+            message.username
+          )}
         </strong>
 
         <p>
-          ${escapeHTML(message.content)}
+          ${escapeHTML(
+            message.content
+          )}
         </p>
 
         <small>
@@ -593,7 +926,9 @@ function renderMessage(message) {
   }
 
 
-  messagesContainer.appendChild(element);
+  messagesContainer.appendChild(
+    element
+  );
 
 }
 
@@ -608,7 +943,11 @@ async function sendMessage() {
     messageInput.value.trim();
 
 
-  if (!content || !currentUser) {
+  if (
+    !content ||
+    !currentUser
+  ) {
+
     return;
   }
 
@@ -626,40 +965,67 @@ async function sendMessage() {
   sendButton.disabled = true;
 
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("messages")
-      .insert({
+  try {
 
-        username,
-        content
+    const result =
+      await withTimeout(
 
-      });
+        supabaseClient
+          .from("messages")
+          .insert({
+
+            username,
+
+            content
+
+          }),
+
+        10000
+
+      );
 
 
-  sendButton.disabled = false;
+    if (result.error) {
+
+      console.error(
+        "Send message error:",
+        result.error
+      );
 
 
-  if (error) {
+      alert(
+        "Xabar yuborilmadi: " +
+        result.error.message
+      );
+
+
+      return;
+    }
+
+
+    messageInput.value = "";
+
+    messageInput.focus();
+
+
+  } catch (error) {
 
     console.error(
-      "Send message error:",
+      "Send message timeout:",
       error
     );
 
+
     alert(
-      "Xabar yuborilmadi."
+      "Xabar yuborishda xatolik: " +
+      error.message
     );
 
-    return;
+  } finally {
+
+    sendButton.disabled = false;
+
   }
-
-
-  messageInput.value = "";
-
-  messageInput.focus();
 
 }
 
@@ -702,7 +1068,9 @@ messageInput.addEventListener(
 // ========================================
 
 supabaseClient
-  .channel("dessenjer-messages")
+  .channel(
+    "dessenjer-messages"
+  )
   .on(
     "postgres_changes",
     {
@@ -734,7 +1102,9 @@ searchInput.addEventListener(
   "input",
   () => {
 
-    clearTimeout(searchTimer);
+    clearTimeout(
+      searchTimer
+    );
 
 
     const query =
@@ -761,48 +1131,71 @@ searchInput.addEventListener(
 
 
 // ========================================
-// SEARCH USERS FROM SUPABASE
+// SEARCH USERS
 // ========================================
 
-async function searchUsers(query) {
+async function searchUsers(
+  query
+) {
 
   if (!currentUser) {
     return;
   }
 
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("profiles")
-      .select(
-        "id, username, status"
-      )
-      .ilike(
-        "username",
-        `%${query}%`
-      )
-      .neq(
-        "id",
-        currentUser.id
-      )
-      .limit(10);
+  try {
+
+    const result =
+      await withTimeout(
+
+        supabaseClient
+          .from("profiles")
+          .select(
+            "id, username, status"
+          )
+          .ilike(
+            "username",
+            `%${query}%`
+          )
+          .neq(
+            "id",
+            currentUser.id
+          )
+          .limit(10),
+
+        10000
+
+      );
 
 
-  if (error) {
+    const data = result.data;
+    const error = result.error;
+
+
+    if (error) {
+
+      console.error(
+        "User search error:",
+        error
+      );
+
+      return;
+    }
+
+
+    renderSearchResults(
+      data
+    );
+
+
+  } catch (error) {
 
     console.error(
-      "User search error:",
+      "User search timeout:",
       error
     );
 
-    return;
   }
-
-
-  renderSearchResults(data);
 
 }
 
@@ -811,12 +1204,14 @@ async function searchUsers(query) {
 // SEARCH RESULTS
 // ========================================
 
-function renderSearchResults(users) {
+function renderSearchResults(
+  users
+) {
 
   chatList.innerHTML = "";
 
 
-  if (!users.length) {
+  if (!users || !users.length) {
 
     chatList.innerHTML = `
       <div class="search-empty">
@@ -832,13 +1227,13 @@ function renderSearchResults(users) {
     user => {
 
       const chat =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
 
-      chat.className = "chat";
-
-      chat.dataset.name =
-        user.username;
+      chat.className =
+        "chat";
 
 
       const letter =
@@ -861,7 +1256,9 @@ function renderSearchResults(users) {
         <div class="chat-info">
 
           <strong>
-            ${escapeHTML(user.username)}
+            ${escapeHTML(
+              user.username
+            )}
           </strong>
 
           <span>
@@ -877,15 +1274,25 @@ function renderSearchResults(users) {
         () => {
 
           document
-            .querySelectorAll(".chat")
+            .querySelectorAll(
+              ".chat"
+            )
             .forEach(
-              item =>
+              item => {
+
                 item.classList
-                  .remove("active")
+                  .remove(
+                    "active"
+                  );
+
+              }
             );
 
 
-          chat.classList.add("active");
+          chat.classList.add(
+            "active"
+          );
+
 
           chatTitle.textContent =
             user.username;
@@ -898,7 +1305,9 @@ function renderSearchResults(users) {
       );
 
 
-      chatList.appendChild(chat);
+      chatList.appendChild(
+        chat
+      );
 
     }
   );
@@ -1000,7 +1409,9 @@ function showDefaultChats() {
 function setupDefaultChats() {
 
   document
-    .querySelectorAll(".chat")
+    .querySelectorAll(
+      ".chat"
+    )
     .forEach(
       chat => {
 
@@ -1009,11 +1420,15 @@ function setupDefaultChats() {
           () => {
 
             document
-              .querySelectorAll(".chat")
+              .querySelectorAll(
+                ".chat"
+              )
               .forEach(
                 item =>
                   item.classList
-                    .remove("active")
+                    .remove(
+                      "active"
+                    )
               );
 
 
@@ -1054,19 +1469,28 @@ function scrollMessages() {
 }
 
 
-function escapeHTML(text) {
+function escapeHTML(
+  text
+) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  div.textContent = text;
+
+  div.textContent =
+    text;
+
 
   return div.innerHTML;
 
 }
 
 
-function showAuthMessage(message) {
+function showAuthMessage(
+  message
+) {
 
   authMessage.textContent =
     message;
@@ -1076,12 +1500,19 @@ function showAuthMessage(message) {
 
 function clearAuthMessage() {
 
-  authMessage.textContent = "";
+  authMessage.textContent =
+    "";
 
 }
 
 
-function setAuthLoading(loading) {
+function setAuthLoading(
+  loading
+) {
+
+  authBusy =
+    loading;
+
 
   authButton.disabled =
     loading;
@@ -1102,12 +1533,53 @@ function setAuthLoading(loading) {
 // ========================================
 
 supabaseClient.auth.onAuthStateChange(
-  async (event, session) => {
+  (event, session) => {
+
+    console.log(
+      "AUTH EVENT:",
+      event
+    );
+
 
     if (
       session?.user &&
       !currentUser
     ) {
+
+      currentUser =
+        session.user;
+
+    }
+
+  }
+);
+
+
+// ========================================
+// START APP
+// ========================================
+
+async function startApp() {
+
+  try {
+
+    const result =
+      await withTimeout(
+
+        supabaseClient
+          .auth
+          .getSession(),
+
+        10000
+
+      );
+
+
+    const session =
+      result.data?.session;
+
+
+    if (session) {
 
       currentUser =
         session.user;
@@ -1141,65 +1613,26 @@ supabaseClient.auth.onAuthStateChange(
       }
 
 
-      showApp();
-
-    }
-
-  }
-);
+      await showApp();
 
 
-// ========================================
-// START APP
-// ========================================
+    } else {
 
-async function startApp() {
+      app.hidden = true;
 
-  const {
-    data
-  } =
-    await supabaseClient
-      .auth
-      .getSession();
-
-
-  if (data.session) {
-
-    currentUser =
-      data.session.user;
-
-
-    currentProfile =
-      await getProfile(
-        currentUser.id
-      );
-
-
-    if (!currentProfile) {
-
-      const username =
-        currentUser
-          .user_metadata
-          ?.username
-        ||
-        currentUser.email
-          ?.split("@")[0]
-        ||
-        "User";
-
-
-      currentProfile =
-        await createProfile(
-          currentUser.id,
-          username
-        );
+      authScreen.style.display =
+        "flex";
 
     }
 
 
-    showApp();
+  } catch (error) {
 
-  } else {
+    console.error(
+      "START APP ERROR:",
+      error
+    );
+
 
     app.hidden = true;
 
