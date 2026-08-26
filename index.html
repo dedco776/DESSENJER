@@ -425,20 +425,34 @@
        FALLBACK CDN
   ========================== -->
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <!-- Agar jsDelivr ishlamasa, brauzer konsolida ko‘rinadi -->
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-  <!-- =========================
-       DESSENJER API
-  ========================== -->
+<script>
+  const SUPABASE_URL =
+    "https://itdbusdpkgcxyxzbfrjn.supabase.co";
 
-  <script src="./api/api.js"></script>
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwicmVmIjoiaXRkYnVzZHBnY3h5eHpibnJqbiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg3Njc1NDYyLCJleHAiOjIxMDMyNTE0NjJ9.rBOF9muR_S2xba_8x-6AObMOs7clvyleKG9c8TnZYAc";
 
-  <!-- =========================
-       DESSENJER APP
-  ========================== -->
+  if (!window.supabase) {
+    document.body.innerHTML =
+      "<h2 style='color:red;text-align:center'>Supabase yuklanmadi</h2>";
 
-  <script src="./js/app.js"></script>
+    throw new Error("Supabase library yuklanmadi");
+  }
 
-</body>
-</html>
+  window.supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+  console.log("DESSENJER: Supabase OK");
+</script>
+
+<!-- API -->
+<script src="./api/api.js"></script>
+
+<!-- APP -->
+<script src="./js/app.js"></script>
